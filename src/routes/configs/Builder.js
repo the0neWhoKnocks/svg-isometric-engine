@@ -2,6 +2,7 @@ import { BUILDER } from 'CONSTANTS/routePaths';
 import { Builder } from 'ROUTES/shared/composedChunks';
 
 const ROUTE = {
+  exact: true,
   label: 'Builder',
   path: BUILDER,
   view: Builder,
