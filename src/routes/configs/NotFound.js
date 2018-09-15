@@ -1,7 +1,8 @@
 import NotFound from 'COMPONENTS/views/NotFound';
+import { NOT_FOUND } from 'CONSTANTS/routePaths';
 
 const ROUTE = {
-  path: '*',
+  path: NOT_FOUND,
   view: NotFound,
 };
 

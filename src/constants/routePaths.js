@@ -1,3 +1,2 @@
-export const BUILDER = '/builder';
-export const CATCH_ALL = '*';
-export const ROOT = '/';
+export const BUILDER = '/';
+export const NOT_FOUND = '*';
