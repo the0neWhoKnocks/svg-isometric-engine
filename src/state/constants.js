@@ -1,4 +1,4 @@
-const NAME = 'APP';
+const NAME = 'Builder';
 const initialState = () => ({
   nextPage: undefined,
   previousView: undefined,

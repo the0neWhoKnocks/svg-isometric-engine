@@ -6,6 +6,7 @@ import {
 const globals = () => {
   css.insert(`
     .view.is--builder {
+      font-family: monospace;
       background-color: ${ DARK_THEME__BG_COLOR };
     }
     .view.is--builder .view-content {
@@ -37,7 +38,8 @@ const styles = {
       // backgroundRepeat: 'no-repeat',
       // backgroundPosition: '50%',
       opacity: 0.2,
-      zIndex: 1,
+      position: 'relative',
+      zIndex: 100, // ensures the hover state is above all children
 
       ':hover': {
         transition: 'all 0.25s ease',

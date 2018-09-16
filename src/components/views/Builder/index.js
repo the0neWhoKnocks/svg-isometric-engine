@@ -47,12 +47,14 @@ class Builder extends Component {
               </nav>
               <Tabs items={[
                 {
-                  label: 'Tiles',
                   content: <TilesBrowser />,
+                  icon: 'collections',
+                  label: 'Tiles',
                 },
                 {
-                  label: 'Layers',
                   content: <Layers />,
+                  icon: 'layers',
+                  label: 'Layers',
                 },
               ]}>
               </Tabs>

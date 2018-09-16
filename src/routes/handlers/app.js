@@ -1,4 +1,23 @@
+import { readFileSync } from 'fs';
+import { resolve } from 'path';
+import glob from 'glob';
+import { paths } from 'SRC/../conf.app';
 import routeWrapper from 'UTILS/routeWrapper';
+
+// TODO - For now just dumping all sprites. This should be trimmed down to just
+// what's needed.
+let svgSprites = '';
+glob.sync('**/*.svg', {
+  cwd: resolve(__dirname, `${ paths.DIST_PUBLIC }/svgs`),
+}).forEach((fileName) => {
+  let svg = readFileSync(`${ paths.DIST_PUBLIC }/svgs/${ fileName }`, 'utf8');
+  svg = svg.replace('<?xml version="1.0" encoding="utf-8"?>', '');
+  svg = svg.replace(
+    '<svg ',
+    '<svg style="display:none; position:absolute" width="0" height="0" style="position:absolute" '
+  );
+  svgSprites += svg;
+});
 
 export default routeWrapper.bind(null, (req, res) => {
   const { statSync } = require('fs');
@@ -25,9 +44,9 @@ export default routeWrapper.bind(null, (req, res) => {
     BLUE_END,
   } = require('UTILS/logger');
   const awaitSSRData = require('UTILS/awaitSSRData').default;
-  
+
   const isDev = process.env.NODE_ENV === 'development';
-  
+
   // if a relative file request makes it here, it's most likely an error
   if( /.*\.(js|css|json|jpg|png|gif)$/.test(req.url) ){
     res.status(404);
@@ -36,14 +55,14 @@ export default routeWrapper.bind(null, (req, res) => {
 
   // ensures the favicon is always current (with every start of the server)
   const faviconModTime = statSync(appConfig.paths.FAVICON).mtimeMs;
-  
+
   awaitSSRData(
     req.url,
     req.params,
     CLIENT_ROUTES,
   ).then(() => {
     store.app.dispatch( setShellClass({ pathname: req.path }) );
-    
+
     let modules = [];
     const captureSSRChunks = (moduleName) => modules.push(moduleName);
 
@@ -84,6 +103,7 @@ export default routeWrapper.bind(null, (req, res) => {
         glamor: { ids },
         ssrChunks,
         state: serialize(store.app.getState()),
+        svgSprites,
         title: appConfig.APP_TITLE,
       }));
     }
