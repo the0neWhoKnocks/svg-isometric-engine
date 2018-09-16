@@ -3,14 +3,13 @@ import {
   DARK_THEME__BG_COLOR,
 } from 'CONSTANTS/styles';
 
-const tabColor = '#333';
+const tabColor = '#525252';
 const styles = {
   root: css({
     paddingTop: '0.5em',
   }),
 
   tabBtnsNav: css({
-    borderBottom: `solid 1px ${ tabColor }`,
     boxShadow: 'inset 0px -7px 8px -3px rgba(0,0,0,0.25)',
     position: 'relative',
     zIndex: 0,
@@ -20,28 +19,42 @@ const styles = {
     display: 'none',
 
     ':checked + .tab-btn': {
-      borderBottom: `solid 1px ${ DARK_THEME__BG_COLOR }`,
-      marginBottom: '-1px',
-      boxShadow: '0px 4px 16px 3px rgba(0,0,0,0.5)',
+      color: '#eee',
+      boxShadow: '0px 2px 7px 2px rgba(0,0,0,0.65)',
       background: DARK_THEME__BG_COLOR,
       zIndex: 1,
       transform: 'translateY(0px)',
+
+      ' .tab-icon': {
+        fill: '#00fffa',
+      },
     },
   }),
 
   tabBtn: css({
-    color: '#eee',
+    color: '#bdbdbd',
+    textTransform: 'uppercase',
     padding: '0.25em 1em',
-    border: 'solid 1px #000',
-    borderBottom: 'none',
     borderRadius: '0.5em 0.5em 0em 0em',
-    background: tabColor,
+    background: `linear-gradient(${ tabColor } 73%, #2b2b2b)`,
     display: 'inline-block',
     cursor: 'pointer',
+    userSelect: 'none',
     position: 'relative',
     zIndex: 0,
     transform: 'translateY(2px)',
-    transition: 'transform 0.25s',
+    transition: 'transform 0.1s',
+
+    ' .tab-icon': {
+      width: '1em',
+      height: '1em',
+      fill: 'currentColor',
+      marginTop: '-0.15em',
+      marginRight: '0.15em',
+      marginLeft: '-0.25em',
+      display: 'inline-block',
+      verticalAlign: 'middle',
+    },
   }),
 
   tabs: css({

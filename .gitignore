@@ -20,6 +20,10 @@
 /.assets
 .babelrc
 
+# cloned files
+/.temp
+/src/static/svgs
+
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*

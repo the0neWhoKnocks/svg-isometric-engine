@@ -25,7 +25,7 @@ class Tabs extends Component {
     return (
       <div className={`${ styles.root }`}>
         <nav className={`${ styles.tabBtnsNav }`}>{
-          items.map(({ label }, ndx) => (
+          items.map(({ icon, label }, ndx) => (
             <Fragment key={ label }>
               <input
                 className={`${ styles.tabBtnInput }`}
@@ -39,6 +39,15 @@ class Tabs extends Component {
                 className={`tab-btn ${ styles.tabBtn }`}
                 htmlFor={ `tabBtn_${ ndx }` }
               >
+                { icon && (
+                  /* TODO - Move this SVG implementation to a SvgSprite component */
+                  <svg
+                    className="tab-icon"
+                    dangerouslySetInnerHTML={{
+                      __html: `<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#ic_${ icon }_24px"></use>`,
+                    }}
+                  />
+                )}
                 { label }
               </label>
             </Fragment>
@@ -54,8 +63,9 @@ class Tabs extends Component {
 
 Tabs.propTypes = {
   items: arrayOf(shape({
-    label: string,
-    content: node,
+    content: node.isRequired,
+    icon: string,
+    label: string.isRequired,
   })),
 };
 

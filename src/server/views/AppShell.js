@@ -45,6 +45,7 @@ module.exports = function(model){
         ${ stateScript }
       </head>
       <body>
+        ${ model.svgSprites }
         <div id="root" class="root">${ model.body }</div>
         ${ bundleScripts }
         ${ reloadScript }
