@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import SvgIcon from 'COMPONENTS/SvgIcon';
+import FilePicker from './components/FilePicker';
 import Tile from './components/Tile';
 import styles from './styles';
 
@@ -9,18 +11,13 @@ class TilesBrowser extends Component {
     this.state = {
       tiles: [],
     };
-    this.handleTilesUpload = this.handleTilesUpload.bind(this);
+    this.handleChosenTiles = this.handleChosenTiles.bind(this);
   }
-  
-  handleTilesUpload(ev) {
-    const files = ev.currentTarget.files;
-    const tiles = [];
-    
-    for(let i=0; i<files.length; i++){
-      const currFile = files[i];
-      // Only process image files.
-      if( !currFile.type.match('image.*') ) continue;
 
+  handleChosenTiles(files) {
+    const tiles = [];
+
+    files.forEach((currFile) => {
       const reader = new FileReader();
 
       // Closure to capture the file information.
@@ -30,7 +27,7 @@ class TilesBrowser extends Component {
             image: fileEv.target.result,
             name: escape(tile.name),
           });
-          
+
           // Once all the tiles have been loaded, update the view
           if(tiles.length === files.length){
             this.setState({
@@ -46,7 +43,7 @@ class TilesBrowser extends Component {
 
       // Read in the image file as a data URL.
       reader.readAsDataURL(currFile);
-    }
+    });
   }
 
   render() {
@@ -55,18 +52,20 @@ class TilesBrowser extends Component {
     return (
       <div className={`${ styles.root }`}>
         <nav className={`${ styles.nav }`}>
-          <input
-            type="file"
+          <FilePicker
             accept="image/*"
-            multiple="true"
-            onChange={ this.handleTilesUpload }
+            allowMultiple
+            btnLabel={ <SvgIcon name="add_to_photos" /> }
+            className="nav-btn"
+            onFilesChosen={ this.handleChosenTiles }
           />
-          <input
-            type="file"
+          <FilePicker
             accept="image/*"
-            webkitdirectory="true"
-            mozdirectory="true"
-            onChange={ this.handleTilesUpload }
+            allowDirectory
+            btnLabel={ <SvgIcon name="create_new_folder" /> }
+            btnTooltip="Choose Folder"
+            className="nav-btn"
+            onFilesChosen={ this.handleChosenTiles }
           />
         </nav>
         <div className={`${ styles.tiles }`}>
