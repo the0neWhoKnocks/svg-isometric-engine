@@ -1,5 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import { arrayOf, node, shape, string } from 'prop-types';
+import SvgIcon from 'COMPONENTS/SvgIcon';
 import styles from './styles';
 
 class Tabs extends Component {
@@ -40,12 +41,9 @@ class Tabs extends Component {
                 htmlFor={ `tabBtn_${ ndx }` }
               >
                 { icon && (
-                  /* TODO - Move this SVG implementation to a SvgSprite component */
-                  <svg
+                  <SvgIcon
                     className="tab-icon"
-                    dangerouslySetInnerHTML={{
-                      __html: `<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#ic_${ icon }_24px"></use>`,
-                    }}
+                    name={ icon }
                   />
                 )}
                 { label }

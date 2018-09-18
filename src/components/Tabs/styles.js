@@ -46,14 +46,9 @@ const styles = {
     transition: 'transform 0.1s',
 
     ' .tab-icon': {
-      width: '1em',
-      height: '1em',
-      fill: 'currentColor',
       marginTop: '-0.15em',
       marginRight: '0.15em',
       marginLeft: '-0.25em',
-      display: 'inline-block',
-      verticalAlign: 'middle',
     },
   }),
 
