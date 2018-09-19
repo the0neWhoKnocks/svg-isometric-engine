@@ -38,9 +38,21 @@ class Builder extends Component {
   }
 
   componentDidMount() {
-    const project = getData('project');
-
-    if(project) store.app.dispatch( setProject(project) );
+    if(
+      // there are projects to reference
+      this.props.projects.length
+      // a project hasn't already been specified (in the URL)
+      && !this.props.project
+    ){
+      const project = getData('project');
+      
+      if(
+        // a project was previously chosen
+        project 
+        // that project exists
+        && this.props.projects.includes(project)
+      ) store.app.dispatch( setProject(project) );
+    }
 
     this.setState({
       mounted: true,

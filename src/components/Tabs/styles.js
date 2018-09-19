@@ -3,7 +3,6 @@ import {
   DARK_THEME__BG_COLOR,
 } from 'CONSTANTS/styles';
 
-const tabColor = '#525252';
 const styles = {
   root: css({
     paddingTop: '0.5em',
@@ -40,7 +39,7 @@ const styles = {
     textTransform: 'uppercase',
     padding: '0.25em 1em',
     borderRadius: '0.5em 0.5em 0em 0em',
-    background: `linear-gradient(${ tabColor } 73%, #2b2b2b)`,
+    background: 'linear-gradient(#00000040 73%, #00000070)',
     display: 'inline-block',
     cursor: 'pointer',
     userSelect: 'none',

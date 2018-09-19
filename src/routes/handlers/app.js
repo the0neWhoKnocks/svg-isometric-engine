@@ -20,7 +20,11 @@ glob.sync('**/*.svg', {
 });
 
 export default routeWrapper.bind(null, (req, res) => {
-  const { readdirSync, statSync } = require('fs-extra');
+  const {
+    readdirSync,
+    stat,
+    statSync,
+  } = require('fs-extra');
   const React = require('react');
   const { renderToString } = require('react-dom/server');
   const Loadable = require('react-loadable');
@@ -28,11 +32,13 @@ export default routeWrapper.bind(null, (req, res) => {
   const { renderStatic } = require('glamor/server');
   const serialize = require('serialize-javascript');
   const ClientShell = require('COMPONENTS/Shell').default;
+  const { PROJECT } = require('CONSTANTS/queryParams');
   const appConfig = require('ROOT/conf.app');
   const { CLIENT_ROUTES } = require('ROUTES');
   const AppShell = require('SERVER/views/AppShell');
   const loadableStats = require('SRC/react-loadable.json');
   const {
+    setProject,
     setProjects,
     setShellClass,
   } = require('STATE/actions');
@@ -45,7 +51,10 @@ export default routeWrapper.bind(null, (req, res) => {
     BLUE_END,
   } = require('UTILS/logger');
   const awaitSSRData = require('UTILS/awaitSSRData').default;
-
+  
+  const { dispatch, getState } = store.app;
+  const { query } = req;
+  
   const isDev = process.env.NODE_ENV === 'development';
 
   // if a relative file request makes it here, it's most likely an error
@@ -58,59 +67,66 @@ export default routeWrapper.bind(null, (req, res) => {
   const faviconModTime = statSync(appConfig.paths.FAVICON).mtimeMs;
 
   // check for existing projects
-  const projects = readdirSync(appConfig.paths.PROJECTS);
+  stat(appConfig.paths.PROJECTS, (err, stat) => {
+    const projects = ( !err && stat.isDirectory() )
+      ? readdirSync(appConfig.paths.PROJECTS)
+      : [];
+      
+    awaitSSRData(
+      req.url,
+      req.params,
+      CLIENT_ROUTES,
+    ).then(() => {
+      dispatch( setShellClass({ pathname: req.path }) );
+      // Need to set this regardless if it's empty. Otherwise the state could
+      // persist in watch mode even if the directory doesn't exist.
+      dispatch( setProjects(projects) );
+      if( query[PROJECT] ) dispatch( setProject(query[PROJECT]) );
 
-  awaitSSRData(
-    req.url,
-    req.params,
-    CLIENT_ROUTES,
-  ).then(() => {
-    store.app.dispatch( setShellClass({ pathname: req.path }) );
-    if(projects) store.app.dispatch( setProjects(projects) );
+      let modules = [];
+      const captureSSRChunks = (moduleName) => modules.push(moduleName);
 
-    let modules = [];
-    const captureSSRChunks = (moduleName) => modules.push(moduleName);
+      // The `context` object contains the results of the render.
+      // `context.url` will contain the URL to redirect to if a <Redirect> was used.
+      const context = {};
+      let { html, css, ids } = renderStatic(() =>
+        renderToString(
+          <Loadable.Capture report={captureSSRChunks}>
+            <ClientShell
+              context={ context }
+              request={ req }
+            />
+          </Loadable.Capture>
+        )
+      );
+      let ssrChunks = getBundles(loadableStats, modules);
 
-    // The `context` object contains the results of the render.
-    // `context.url` will contain the URL to redirect to if a <Redirect> was used.
-    const context = {};
-    let { html, css, ids } = renderStatic(() =>
-      renderToString(
-        <Loadable.Capture report={captureSSRChunks}>
-          <ClientShell
-            context={ context }
-            request={ req }
-          />
-        </Loadable.Capture>
-      )
-    );
-    let ssrChunks = getBundles(loadableStats, modules);
-
-    if( context.url ){
-      res.redirect(302, context.url);
-    }
-    else{
-      if(ssrChunks.length){
-        const chunkNames = ssrChunks
-          .filter((chunk) => !chunk.file.endsWith('.map'))
-          .map((chunk) => `\n  - ${ BLUE_START } ${ chunk.file } ${ BLUE_END }`);
-        log(`${ BLACK_ON_GREEN } CHUNKS`, 'Will be pre-loaded on the Client:', chunkNames.join(''));
+      if( context.url ){
+        res.redirect(302, context.url);
       }
       else{
-        log(`${ BLACK_ON_YELLOW } WARNING`, 'No SSR chunks were detected, this may be an error');
-      }
+        if(ssrChunks.length){
+          const chunkNames = ssrChunks
+            .filter((chunk) => !chunk.file.endsWith('.map'))
+            .map((chunk) => `\n  - ${ BLUE_START } ${ chunk.file } ${ BLUE_END }`);
+          log(`${ BLACK_ON_GREEN } CHUNKS`, 'Will be pre-loaded on the Client:', chunkNames.join(''));
+        }
+        else{
+          log(`${ BLACK_ON_YELLOW } WARNING`, 'No SSR chunks were detected, this may be an error');
+        }
 
-      res.send(AppShell({
-        body: html,
-        css,
-        dev: isDev,
-        faviconModTime,
-        glamor: { ids },
-        ssrChunks,
-        state: serialize(store.app.getState()),
-        svgSprites,
-        title: appConfig.APP_TITLE,
-      }));
-    }
+        res.send(AppShell({
+          body: html,
+          css,
+          dev: isDev,
+          faviconModTime,
+          glamor: { ids },
+          ssrChunks,
+          state: serialize( getState() ),
+          svgSprites,
+          title: appConfig.APP_TITLE,
+        }));
+      }
+    });
   });
 });
