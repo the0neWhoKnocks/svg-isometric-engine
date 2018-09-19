@@ -20,12 +20,15 @@ class Tabs extends Component {
   }
 
   render() {
-    const { items } = this.props;
+    const {
+      className,
+      items,
+    } = this.props;
     const { tabNdx } = this.state;
 
     return (
-      <div className={`${ styles.root }`}>
-        <nav className={`${ styles.tabBtnsNav }`}>{
+      <div className={`tabs ${ styles.root } ${ className }`}>
+        <nav className={`tabs__nav ${ styles.tabBtnsNav }`}>{
           items.map(({ icon, label }, ndx) => (
             <Fragment key={ label }>
               <input
@@ -51,7 +54,7 @@ class Tabs extends Component {
             </Fragment>
           ))
         }</nav>
-        <div className={`${ styles.tabs }`}>
+        <div className={`tabs__tab ${ styles.currentTab }`}>
           { items[tabNdx].content }
         </div>
       </div>
@@ -60,6 +63,7 @@ class Tabs extends Component {
 }
 
 Tabs.propTypes = {
+  className: string,
   items: arrayOf(shape({
     content: node.isRequired,
     icon: string,

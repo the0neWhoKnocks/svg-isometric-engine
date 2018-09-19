@@ -2,9 +2,9 @@ import React from 'react';
 import { connect, Provider } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import { arrayOf, node, shape, string } from 'prop-types';
+import defaultFooter from 'COMPONENTS/Footer';
 import defaultHeader from 'COMPONENTS/Header';
 import defaultMain from 'COMPONENTS/Main';
-import defaultFooter from 'COMPONENTS/Footer';
 import { CLIENT_ROUTES } from 'ROUTES';
 import {
   headerNavItems as defaultHeaderNavItems,
@@ -70,7 +70,7 @@ const composeShell = (
     }
 
     const ConnectedShell = withRouter(connect(mapStateToProps)(ShellWrap));
-
+    
     return (
       <Provider store={ store.app }>
         <Router { ...routerProps }>

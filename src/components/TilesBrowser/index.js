@@ -4,6 +4,7 @@ import FilePicker from './components/FilePicker';
 import Tile from './components/Tile';
 import styles from './styles';
 
+const FILE_TYPES = 'image/*';
 class TilesBrowser extends Component {
   constructor() {
     super();
@@ -50,17 +51,17 @@ class TilesBrowser extends Component {
     const { tiles } = this.state;
 
     return (
-      <div className={`${ styles.root }`}>
-        <nav className={`${ styles.nav }`}>
+      <div className={`tiles-browser ${ styles.root }`}>
+        <nav className={`tiles-browser__nav ${ styles.nav }`}>
           <FilePicker
-            accept="image/*"
+            accept={ FILE_TYPES }
             allowMultiple
             btnLabel={ <SvgIcon name="add_to_photos" /> }
             className="nav-btn"
             onFilesChosen={ this.handleChosenTiles }
           />
           <FilePicker
-            accept="image/*"
+            accept={ FILE_TYPES }
             allowDirectory
             btnLabel={ <SvgIcon name="create_new_folder" /> }
             btnTooltip="Choose Folder"
@@ -68,7 +69,7 @@ class TilesBrowser extends Component {
             onFilesChosen={ this.handleChosenTiles }
           />
         </nav>
-        <div className={`${ styles.tiles }`}>
+        <div className={`tiles-browser__tiles ${ styles.tiles }`}>
           {tiles.map(({ image, name }, ndx) => {
             return (
               <Tile

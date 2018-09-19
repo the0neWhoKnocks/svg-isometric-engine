@@ -7,6 +7,10 @@ const tabColor = '#525252';
 const styles = {
   root: css({
     paddingTop: '0.5em',
+    // Ensures the tabs take up 100% of their available height
+    display: 'flex',
+    flexDirection: 'column',
+    flexGrow: 1,
   }),
 
   tabBtnsNav: css({
@@ -52,10 +56,12 @@ const styles = {
     },
   }),
 
-  tabs: css({
+  currentTab: css({
     background: DARK_THEME__BG_COLOR,
     position: 'relative',
     zIndex: 1,
+    // tab will fill the remaining height based on available space
+    flexGrow: 1,
   }),
 };
 

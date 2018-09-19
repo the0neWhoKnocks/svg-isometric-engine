@@ -84,6 +84,19 @@ const styles = {
       },
     },
   }),
+  
+  rail: css({
+    height: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+  }),
+  
+  tabs: css({
+    ' .tabs__tab': {
+      display: 'flex',
+      flexDirection: 'column',
+    },
+  }),
 };
 
 export default styles;

@@ -15,6 +15,12 @@ import {
 
 // let pendingItems;
 
+const createProject = opts => {
+  console.log('--', opts);
+  return (dispatch, getState) => {
+    
+  };
+};
 // const fetchMoreItems = url => {
 //   return (dispatch, getState) => {
 //     // On slow connections this can stack up if the user scrolls up and down
@@ -77,6 +83,7 @@ const setViewData = data => ({
 });
 
 export {
+  createProject,
   // fetchMoreItems,
   // setItemLoaded,
   // setItemResults,

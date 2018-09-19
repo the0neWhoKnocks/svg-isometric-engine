@@ -2,6 +2,24 @@
 
 ---
 
+## Projects
+
+- [ ] Create
+  - [ ] If no projects have been detected on the server, lock the UI and only
+    allow for creation of a new project.
+  - On create:
+    - [ ] Create a `projects` directory.
+      - [ ] Create a directory that matches what the user entered.
+        - [ ] Create a `tiles` directory.
+    - Set a localStorage entry to:
+      - [ ] Maintain project name for later load.
+      - [ ] Maintain GUI pane positioning.
+- [ ] Import
+  - [ ] Uploads a `zip` file to the `projects` directory and expands it.
+  - [ ] Loads the imported project.
+- [ ] Export
+  - [ ] Creates a `zip` of the current project and allows the user to download it.
+
 ## Tile Builder
 
 - [ ] **GUI**
