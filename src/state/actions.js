@@ -1,4 +1,6 @@
+import { PROJECT } from 'CONSTANTS/queryParams';
 import { add as saveData } from 'UTILS/storage';
+import setParam from 'UTILS/setParam';
 import {
   CLEAR_DIALOG_ERROR,
   SET_DIALOG_ERROR,
@@ -23,10 +25,14 @@ const createProject = opts => {
   axios[method](url, body)
     .then((resp) => {
       const { data: { projects } } = resp;
+      const currProject = projects[0];
+      
       dispatch( clearDialogError() );
       dispatch( setProjects(projects) );
-      dispatch( setProject(projects[0]) );
-      saveData('project', projects[0]);
+      dispatch( setProject(currProject) );
+      
+      saveData('project', currProject);
+      setParam(PROJECT, currProject);
     })
     .catch((err) => {
       const { data, status, statusText } = err.response;
