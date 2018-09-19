@@ -11,6 +11,7 @@ const SRC = (inDist) ? DIST_PRIVATE : `${ ROOT }/src`;
 const SRC_STATIC = (inDist) ? DIST_PUBLIC : `${ SRC }/static`;
 const SRC_MEDIA = `${ SRC_STATIC }/media`;
 const PACKAGE_JSON = (inDist) ? `${ DIST }/package.json` : `${ ROOT }/package.json`;
+const PROJECTS = `${ DIST_PUBLIC }/projects`;
 
 const conf = {
   app: {
@@ -31,6 +32,7 @@ const conf = {
     JEST: `${ ROOT }/.jest`,
     NODE_MODULES: `${ ROOT }/node_modules`,
     PACKAGE_JSON,
+    PROJECTS,
     ROOT,
     SRC,
     SRC_STATIC,
@@ -47,6 +49,7 @@ const conf = {
       CONSTANTS: `${ SRC }/constants`,
       DIST_PRIVATE,
       DIST_PUBLIC,
+      PROJECTS,
       ROOT,
       ROUTES: `${ SRC }/routes`,
       SERVER: `${ SRC }/server`,

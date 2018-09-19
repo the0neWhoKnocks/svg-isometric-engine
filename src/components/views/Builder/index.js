@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-// import { arrayOf, string } from 'prop-types';
+import { arrayOf, number, shape, string } from 'prop-types';
+import { connect } from 'react-redux';
 import SplitPane from 'react-split-pane';
 import Pane from 'react-split-pane/lib/Pane';
 import Dialog from 'COMPONENTS/Dialog';
@@ -7,26 +8,40 @@ import Layers from 'COMPONENTS/Layers';
 import Tabs from 'COMPONENTS/Tabs';
 import TilesBrowser from 'COMPONENTS/TilesBrowser';
 import {
+  setProject,
+} from 'STATE/actions';
+import {
+  getDialogError,
+  getProject,
   getProjects,
 } from 'STATE/selectors';
 import store from 'STATE/store';
+import { get as getData } from 'UTILS/storage';
 import CreateProject from './components/CreateProject';
 import styles, { globals as globalStyles } from './styles';
+
+const builderProps = (state) => ({
+  dialogError: getDialogError(state),
+  project: getProject(state),
+  projects: getProjects(state),
+});
 
 class Builder extends Component {
   constructor() {
     super();
-    
-    const _state = store.app.getState();
+
     this.state = {
       mounted: false,
-      projects: getProjects(_state),
     };
 
     globalStyles();
   }
 
   componentDidMount() {
+    const project = getData('project');
+
+    if(project) store.app.dispatch( setProject(project) );
+
     this.setState({
       mounted: true,
     });
@@ -34,10 +49,14 @@ class Builder extends Component {
 
   render() {
     const {
-      mounted,
+      dialogError,
+      project,
       projects,
+    } = this.props;
+    const {
+      mounted,
     } = this.state;
-    // if(!data.length) return null;
+    const projectText = (project) ? ` / ${ project }` : '';
 
     return (
       <div className={`${ styles.root }`}>
@@ -45,7 +64,7 @@ class Builder extends Component {
           <SplitPane split="vertical">
             <Pane initialSize="75%">
               <SplitPane split="horizontal">
-                <Pane>Builder</Pane>
+                <Pane>Builder{ projectText }</Pane>
                 <Pane>Preview</Pane>
               </SplitPane>
             </Pane>
@@ -77,7 +96,10 @@ class Builder extends Component {
           </SplitPane>
         )}
         {!projects.length && (
-          <Dialog modal opened disableClose>
+          <Dialog
+            error={ dialogError }
+            modal opened disableClose
+          >
             <CreateProject />
           </Dialog>
         )}
@@ -86,11 +108,14 @@ class Builder extends Component {
   }
 }
 
-// Builder.propTypes = {
-//
-// };
-// Builder.defaultProps = {
-//
-// };
+Builder.propTypes = {
+  dialogError: shape({
+    data: string,
+    status: number,
+    statusText: string,
+  }),
+  project: string,
+  projects: arrayOf(string),
+};
 
-export default Builder;
+export default connect(builderProps)(Builder);

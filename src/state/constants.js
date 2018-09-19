@@ -1,7 +1,9 @@
 const NAME = 'Builder';
 const initialState = () => ({
+  dialogError: undefined,
   nextPage: undefined,
   previousView: undefined,
+  project: '',
   projects: [],
   shellClass: '',
   scrollPos: {},

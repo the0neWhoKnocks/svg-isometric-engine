@@ -9,23 +9,23 @@ const styles = {
     right: 0,
     bottom: 0,
   }),
-  
+
   root: css({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     zIndex: 100,
   }),
-  
+
   overlay: css({
     background: 'rgba(255, 255, 255, 0.75)',
   }),
-  
+
   nav: css({
     padding: '0.1em 0.15em 0.2em 0.15em',
     textAlign: 'right',
     background: accentColor,
-    
+
     ' button': {
       lineHeight: '1em',
       padding: '0.15em 0.25em',
@@ -33,14 +33,14 @@ const styles = {
       borderRadius: '0.25em',
       cursor: 'pointer',
       background: '#fff',
-      
+
       '[disabled]': {
         opacity: 0,
         cursor: 'default',
       },
     },
   }),
-  
+
   body: css({
     overflow: 'hidden',
     border: `solid 1px ${ accentColor }`,
@@ -50,9 +50,19 @@ const styles = {
     background: '#fff',
     position: 'relative',
   }),
-  
+
   content: css({
     padding: '0.5em 1em',
+  }),
+
+  errorMsg: css({
+    color: '#5d0000',
+    fontFamily: 'monospace',
+    fontWeight: 'bold',
+    borderRadius: '0.25em',
+    padding: '0.5em',
+    marginBottom: '0.5em',
+    background: '#ff9999',
   }),
 };
 

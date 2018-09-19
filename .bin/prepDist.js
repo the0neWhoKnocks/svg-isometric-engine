@@ -8,6 +8,15 @@ async function prepDist() {
     await fs.ensureDir(appConfig.paths.DIST_PRIVATE);
     await fs.ensureDir(appConfig.paths.DIST_PUBLIC);
 
+    // Remove all content but keep the directory so that
+    // if you're in it, you don't end up in Trash
+    await fs.emptyDir(appConfig.paths.DIST_PRIVATE);
+    // Keep some directories
+    fs.readdirSync(appConfig.paths.DIST_PUBLIC).forEach(file => {
+      if( !/projects/.test(file) )
+        fs.removeSync(`${ appConfig.paths.DIST_PUBLIC }/${ file }`);
+    });
+
     // Copy over any top-level files that are needed
     await fs.copy(
       `${ appConfig.paths.ROOT }/conf.app.js`,
@@ -18,11 +27,6 @@ async function prepDist() {
       `${ appConfig.paths.DIST }/package.json`
     );
 
-    // Remove all content but keep the directory so that
-    // if you're in it, you don't end up in Trash
-    await fs.emptyDir(appConfig.paths.DIST_PRIVATE);
-    await fs.emptyDir(appConfig.paths.DIST_PUBLIC);
-    
     // Merge with the public folder
     await fs.copy(appConfig.paths.SRC_STATIC, appConfig.paths.DIST_PUBLIC, {
       dereference: true,

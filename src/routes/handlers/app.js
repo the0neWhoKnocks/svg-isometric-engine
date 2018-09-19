@@ -20,7 +20,7 @@ glob.sync('**/*.svg', {
 });
 
 export default routeWrapper.bind(null, (req, res) => {
-  const { statSync } = require('fs');
+  const { readdirSync, statSync } = require('fs-extra');
   const React = require('react');
   const { renderToString } = require('react-dom/server');
   const Loadable = require('react-loadable');
@@ -33,6 +33,7 @@ export default routeWrapper.bind(null, (req, res) => {
   const AppShell = require('SERVER/views/AppShell');
   const loadableStats = require('SRC/react-loadable.json');
   const {
+    setProjects,
     setShellClass,
   } = require('STATE/actions');
   const { default: store } = require('STATE/store');
@@ -56,12 +57,16 @@ export default routeWrapper.bind(null, (req, res) => {
   // ensures the favicon is always current (with every start of the server)
   const faviconModTime = statSync(appConfig.paths.FAVICON).mtimeMs;
 
+  // check for existing projects
+  const projects = readdirSync(appConfig.paths.PROJECTS);
+
   awaitSSRData(
     req.url,
     req.params,
     CLIENT_ROUTES,
   ).then(() => {
     store.app.dispatch( setShellClass({ pathname: req.path }) );
+    if(projects) store.app.dispatch( setProjects(projects) );
 
     let modules = [];
     const captureSSRChunks = (moduleName) => modules.push(moduleName);

@@ -6,9 +6,11 @@ import log, {
 } from 'UTILS/logger';
 import { initialState } from './constants';
 import {
-  // SET_ITEM_LOADED,
-  // SET_ITEM_RESULTS,
+  CLEAR_DIALOG_ERROR,
+  SET_DIALOG_ERROR,
   SET_PREVIOUS_VIEW,
+  SET_PROJECT,
+  SET_PROJECTS,
   SET_SHELL_CLASS,
   SET_SCROLL_POS,
   SET_VIEW_DATA,
@@ -27,37 +29,43 @@ function reducer(extendedData = {}){
       log(`${ BLACK_ON_GREEN } REDUCER`, type);
 
     switch( type ){
-      // case SET_ITEM_LOADED: {
-      //   const ndx = payload;
-      //   const results = [...state.results];
-      // 
-      //   results[ndx]._loaded = true;
-      // 
-      //   log('  ', `${ BLACK_ON_GRAY } SET`, `Item ${ ndx }'s image has loaded'`);
-      //   return {
-      //     ...state,
-      //     results,
-      //   };
-      // }
-      // 
-      // case SET_ITEM_RESULTS: {
-      //   const { nextPage, results } = payload;
-      //   log('  ', `${ BLACK_ON_GRAY } SET`, 'nextPage & results');
-      //   return {
-      //     ...state,
-      //     nextPage,
-      //     results: [
-      //       ...state.results,
-      //       ...results,
-      //     ],
-      //   };
-      // }
+      case CLEAR_DIALOG_ERROR: {
+        log('  ', `${ BLACK_ON_GRAY } Clear`, 'Dialog error');
+        return {
+          ...state,
+          dialogError: undefined,
+        };
+      }
+
+      case SET_DIALOG_ERROR: {
+        log('  ', `${ BLACK_ON_GRAY } SET`, 'Dialog error');
+        return {
+          ...state,
+          dialogError: payload,
+        };
+      }
 
       case SET_PREVIOUS_VIEW: {
         log('  ', `${ BLACK_ON_GRAY } SET`, 'previous view to:', `${ BLUE } "${ payload }"`);
         return {
           ...state,
           previousView: payload,
+        };
+      }
+
+      case SET_PROJECT: {
+        log('  ', `${ BLACK_ON_GRAY } SET`, 'project to:', `${ BLUE } "${ payload }"`);
+        return {
+          ...state,
+          project: payload,
+        };
+      }
+
+      case SET_PROJECTS: {
+        log('  ', `${ BLACK_ON_GRAY } SET`, 'projects to:', `${ BLUE } ${ JSON.stringify(payload) }`);
+        return {
+          ...state,
+          projects: payload,
         };
       }
 

@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { CREATE_PROJECT } from 'CONSTANTS/routePaths';
 import {
   createProject,
 } from 'STATE/actions';
@@ -7,30 +8,35 @@ import styles from './styles';
 class CreateProject extends Component {
   constructor() {
     super();
-    
+
     this.handleSubmit = this.handleSubmit.bind(this);
   }
-  
+
   handleSubmit(ev) {
     ev.preventDefault();
-    
-    const { action, method } = ev.currentTarget;
-    
-    // TODO - wire this up
+
+    const form = ev.currentTarget;
+    const { action, method } = form;
+    const data = new FormData(form);
+    const body = {};
+
+    for(let entry of data.entries()) {
+      body[entry[0]] = entry[1];
+    }
+
     createProject({
+      body,
       method,
       url: action,
     });
   }
-  
+
   render() {
-    // TODO - expose API endpoints via the store or window prop
-    
     return (
       <form
         className={`${ styles.root }`}
         method="POST"
-        action="/api/project/create"
+        action={ CREATE_PROJECT }
         onSubmit={ this.handleSubmit }
       >
         No projects have been detected.

@@ -1,4 +1,4 @@
-import { getCookie } from 'UTILS/cookie';
+// import { getCookie } from 'UTILS/cookie';
 
 export * from './constants';
 
@@ -7,9 +7,11 @@ export default function logger() {
   let transform;
 
   if(process.env.IS_CLIENT){
-    transformer = (getCookie('logging'))
-      ? import(/* webpackChunkName: "clientLogger" */ './clientTransform')
-      : Promise.resolve({ default: () => {} });
+    // transformer = (getCookie('logging'))
+    //   ? import(/* webpackChunkName: "clientLogger" */ './clientTransform')
+    //   : Promise.resolve({ default: () => {} });
+
+    transformer = import(/* webpackChunkName: "clientLogger" */ './clientTransform');
   }
   else{
     transformer = Promise.resolve( require('./serverTransform') );
