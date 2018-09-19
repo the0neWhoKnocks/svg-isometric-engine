@@ -57,6 +57,7 @@ class TilesBrowser extends Component {
             accept={ FILE_TYPES }
             allowMultiple
             btnLabel={ <SvgIcon name="add_to_photos" /> }
+            btnTooltip="Load tile(s)"
             className="nav-btn"
             onFilesChosen={ this.handleChosenTiles }
           />
@@ -64,7 +65,7 @@ class TilesBrowser extends Component {
             accept={ FILE_TYPES }
             allowDirectory
             btnLabel={ <SvgIcon name="create_new_folder" /> }
-            btnTooltip="Choose Folder"
+            btnTooltip="Load folder of tiles"
             className="nav-btn"
             onFilesChosen={ this.handleChosenTiles }
           />

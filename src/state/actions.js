@@ -1,53 +1,57 @@
-// import {
-//   ITEM,
-//   ROOT,
-//   TERMS,
-// } from 'CONSTANTS/routePaths';
-// import getData from 'UTILS/getData';
+import { add as saveData } from 'UTILS/storage';
 import {
-  // SET_ITEM_LOADED,
-  // SET_ITEM_RESULTS,
+  CLEAR_DIALOG_ERROR,
+  SET_DIALOG_ERROR,
   SET_PREVIOUS_VIEW,
+  SET_PROJECT,
+  SET_PROJECTS,
   SET_SHELL_CLASS,
   SET_SCROLL_POS,
   SET_VIEW_DATA,
 } from './actionTypes';
+import store from './store';
 
-// let pendingItems;
+const clearDialogError = () => ({
+  type: CLEAR_DIALOG_ERROR,
+});
 
 const createProject = opts => {
-  console.log('--', opts);
-  return (dispatch, getState) => {
-    
-  };
+  const axios = require('axios');
+  const { body, method, url } = opts;
+  const { dispatch } = store.app;
+
+  axios[method](url, body)
+    .then((resp) => {
+      const { data: { projects } } = resp;
+      dispatch( clearDialogError() );
+      dispatch( setProjects(projects) );
+      dispatch( setProject(projects[0]) );
+      saveData('project', projects[0]);
+    })
+    .catch((err) => {
+      const { data, status, statusText } = err.response;
+      dispatch(setDialogError({
+        data,
+        status,
+        statusText,
+      }));
+    });
 };
-// const fetchMoreItems = url => {
-//   return (dispatch, getState) => {
-//     // On slow connections this can stack up if the user scrolls up and down
-//     // quickly.
-//     if(!pendingItems){
-//       pendingItems = getData({ url }).then((data) => {
-//         pendingItems = null;
-//         dispatch(setItemResults(data));
-//       });
-//     }
-// 
-//     return pendingItems;
-//   };
-// };
 
-// const setItemLoaded = ndx => ({
-//   type: SET_ITEM_LOADED,
-//   payload: ndx,
-// });
+const setDialogError = err => ({
+  type: SET_DIALOG_ERROR,
+  payload: err,
+});
 
-// const setItemResults = data => ({
-//   type: SET_ITEM_RESULTS,
-//   payload: {
-//     nextPage: data.info.next,
-//     results: data.results,
-//   },
-// });
+const setProject = project => ({
+  type: SET_PROJECT,
+  payload: project,
+});
+
+const setProjects = projects => ({
+  type: SET_PROJECTS,
+  payload: projects,
+});
 
 const setPreviousView = url => ({
   type: SET_PREVIOUS_VIEW,
@@ -83,11 +87,12 @@ const setViewData = data => ({
 });
 
 export {
+  clearDialogError,
   createProject,
-  // fetchMoreItems,
-  // setItemLoaded,
-  // setItemResults,
+  setDialogError,
   setPreviousView,
+  setProject,
+  setProjects,
   setShellClass,
   setScrollPos,
   setViewData,

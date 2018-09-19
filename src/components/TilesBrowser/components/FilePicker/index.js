@@ -11,6 +11,11 @@ class FilePicker extends Component {
       ? [props.accept]
       : props.accept;
     this.handleChosenFiles = this.handleChosenFiles.bind(this);
+    this.handleClick = this.handleClick.bind(this);
+  }
+
+  handleClick(ev) {
+    this.inputRef.click(ev);
   }
 
   handleChosenFiles(ev) {
@@ -59,12 +64,15 @@ class FilePicker extends Component {
         <button
           type="button"
           className={`${ styles.chooseBtn }`}
+          onClick={ this.handleClick }
         >{ btnLabel }</button>
         <input
+          ref={ (ref) => { this.inputRef = ref; } }
           className={`${ styles.fileInput }`}
           type="file"
           title={ btnTooltip }
           onChange={ this.handleChosenFiles }
+          tabIndex="-1"
           { ...inputProps }
         />
       </div>
