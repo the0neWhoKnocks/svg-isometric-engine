@@ -13,7 +13,7 @@
         - [x] Create a `tiles` directory.
     - Set a localStorage entry to:
       - [x] Maintain project name for later load.
-- [ ] **Top Nav**
+- **Top Nav**
   - File:
     - Load:
       - [ ] Text is not grayed out, and there's a side arrow that'll expand a
@@ -109,3 +109,8 @@
 
 **Material Icons**
 - https://material.io/tools/icons/?style=baseline
+  - You can download icons individually or the full icon pack can be downloaded
+  from https://github.com/google/material-design-icons/releases/. Unfortunately
+  the `zip` is around 60mb and you have to unzip it to get to all the nested
+  `svg` folders for each category. I'm just dropping what SVG's I'm using into
+  the `static/svgs` folder for now.

@@ -56,7 +56,7 @@ class TilesBrowser extends Component {
           <FilePicker
             accept={ FILE_TYPES }
             allowMultiple
-            btnLabel={ <SvgIcon name="add_to_photos" /> }
+            btnLabel={ <SvgIcon name="library_add" /> }
             btnTooltip="Load tile(s)"
             className="nav-btn"
             onFilesChosen={ this.handleChosenTiles }

@@ -11,7 +11,7 @@ const SvgIcon = ({
   <svg
     className={`${ styles.icon } ${ className }`}
     dangerouslySetInnerHTML={{
-      __html: `<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#ic_${ name }_24px"></use>`,
+      __html: `<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#${ name }"></use>`,
     }}
   />
 );
@@ -19,6 +19,9 @@ const SvgIcon = ({
 SvgIcon.propTypes = {
   className: string,
   name: string,
+};
+SvgIcon.defaultProps = {
+  className: '',
 };
 
 export default SvgIcon;
