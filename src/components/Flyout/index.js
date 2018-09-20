@@ -11,27 +11,51 @@ import styles, {
 class Flyout extends Component {
   constructor(props) {
     super();
-    
+
     this.state = {
       opened: props.opened,
     };
+
     this.handleChange = this.handleChange.bind(this);
     this.handleExternalClick = this.handleExternalClick.bind(this);
+    this.handleBtnHover = this.handleBtnHover.bind(this);
+    this.handleBtnLeave = this.handleBtnLeave.bind(this);
+
+    if(process.env.IS_CLIENT){
+      if(!window.flyout) window.flyout = {
+        closeAll: this.closeAll,
+      };
+    }
   }
-  
-  handleExternalClick(ev) {
+
+  closeAll() {
+    window.flyout.handlers.reverse().forEach((handler) => {
+      handler();
+    });
+    delete window.flyout.handlers;
+  }
+
+  handleBtnHover(ev) {
+    this.toggle(true);
+  }
+
+  handleBtnLeave(ev) {
+    this.toggle(false);
+  }
+
+  handleExternalClick(ev = {}) {
     const el = ev.target;
-    
-    if( !this.flyoutRef.contains(el) ){
+
+    if( !el || !this.flyoutRef.contains(el) ){
       window.removeEventListener('click', this.handleExternalClick);
       this.toggle(false);
     }
   }
-  
+
   handleChange(ev) {
     this.toggle( !!ev.currentTarget.checked );
   }
-  
+
   toggle(opened) {
     this.setState({
       opened,
@@ -39,15 +63,19 @@ class Flyout extends Component {
       if(opened){
         window.requestAnimationFrame(() => {
           window.addEventListener('click', this.handleExternalClick);
+
+          if(!window.flyout.handlers) window.flyout.handlers = [];
+          window.flyout.handlers.push(this.handleExternalClick);
         });
       }
     });
   }
-  
+
   render() {
     const {
       btnClass,
       children,
+      expandOnHover,
       id,
       label,
       position,
@@ -55,15 +83,22 @@ class Flyout extends Component {
     const {
       opened,
     } = this.state;
-    
+    const btnProps = {};
+
+    if(expandOnHover){
+      btnProps.onMouseOver = this.handleBtnHover;
+      btnProps.onMouseLeave = this.handleBtnLeave;
+    }
+
     return (
       <div
         className={`flyout ${ styles.root }`}
         ref={(ref) => { this.flyoutRef = ref; }}
+        { ...btnProps }
       >
-        <input 
-          id={ id } 
-          type="checkbox" 
+        <input
+          id={ id }
+          type="checkbox"
           checked={ opened }
           onChange={ this.handleChange }
         />
@@ -72,7 +107,7 @@ class Flyout extends Component {
           htmlFor={ id }
           tabIndex="0"
         >{ label }</label>
-        <div 
+        <div
           className={`flyout__content-wrapper ${ positions[position] } ${ styles.contentWrapper }`}
         >
           <div className="flyout__content">{ children }</div>
@@ -85,6 +120,7 @@ class Flyout extends Component {
 Flyout.propTypes = {
   btnClass: string,
   children: node,
+  expandOnHover: bool,
   id: string.isRequired,
   label: oneOfType([
     node,
@@ -95,6 +131,7 @@ Flyout.propTypes = {
 };
 Flyout.defaultProps = {
   btnClass: '',
+  expandOnHover: false,
   label: 'DD Btn',
   opened: false,
   position: BOTTOM,

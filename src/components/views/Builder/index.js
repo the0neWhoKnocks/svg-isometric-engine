@@ -15,7 +15,6 @@ import {
   getProject,
   getProjects,
 } from 'STATE/selectors';
-import store from 'STATE/store';
 import { get as getData } from 'UTILS/storage';
 import CreateProject from './components/CreateProject';
 import TopNav from './components/TopNav';
@@ -46,13 +45,13 @@ class Builder extends Component {
       && !this.props.project
     ){
       const project = getData('project');
-      
+
       if(
         // a project was previously chosen
-        project 
+        project
         // that project exists
         && this.props.projects.includes(project)
-      ) store.app.dispatch( setProject(project) );
+      ) setProject(project);
     }
 
     this.setState({

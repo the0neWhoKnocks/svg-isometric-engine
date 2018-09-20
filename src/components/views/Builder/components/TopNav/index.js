@@ -1,10 +1,13 @@
 import React, { Component, Fragment } from 'react';
 import { connect } from 'react-redux';
-import { arrayOf, string } from 'prop-types';
+import { arrayOf, func, string } from 'prop-types';
 import Flyout, {
   RIGHT,
 } from 'COMPONENTS/Flyout';
 import SvgIcon from 'COMPONENTS/SvgIcon';
+import {
+  setProject,
+} from 'STATE/actions';
 import {
   getProject,
   getProjects,
@@ -15,18 +18,28 @@ const navProps = (state) => ({
   project: getProject(state),
   projects: getProjects(state),
 });
+const navActions = () => ({
+  setProject,
+});
 
 class TopNav extends Component {
-  constructor() {
+  constructor(props) {
     super();
+
+    this.handleProjectSelect = this.handleProjectSelect.bind(this);
   }
-  
+
+  handleProjectSelect(ev) {
+    this.props.setProject( ev.currentTarget.dataset.project );
+    window.flyout.closeAll();
+  }
+
   render() {
     const {
       project,
       projects,
     } = this.props;
-    
+
     return (
       <nav className={`${ styles.root }`}>
         <Flyout
@@ -35,6 +48,7 @@ class TopNav extends Component {
         >
           <Flyout
             btnClass="has--icon"
+            expandOnHover
             id="fileSubNavLoadBtn"
             label={(
               <Fragment>
@@ -48,6 +62,8 @@ class TopNav extends Component {
               <button
                 key={ ndx }
                 className={`${ styles.projectBtns }`}
+                onClick={ this.handleProjectSelect }
+                data-project={ project }
               >{`projects/ ${ project }`}</button>
             ))}
           </Flyout>
@@ -63,6 +79,7 @@ class TopNav extends Component {
 TopNav.propTypes = {
   project: string,
   projects: arrayOf(string),
+  setProject: func,
 };
 
-export default connect(navProps)(TopNav);
+export default connect(navProps, navActions)(TopNav);

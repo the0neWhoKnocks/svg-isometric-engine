@@ -26,13 +26,10 @@ const createProject = opts => {
     .then((resp) => {
       const { data: { projects } } = resp;
       const currProject = projects[0];
-      
+
       dispatch( clearDialogError() );
       dispatch( setProjects(projects) );
-      dispatch( setProject(currProject) );
-      
-      saveData('project', currProject);
-      setParam(PROJECT, currProject);
+      setProject(currProject);
     })
     .catch((err) => {
       const { data, status, statusText } = err.response;
@@ -49,10 +46,19 @@ const setDialogError = err => ({
   payload: err,
 });
 
-const setProject = project => ({
-  type: SET_PROJECT,
-  payload: project,
-});
+const setProject = project => {
+  const { dispatch } = store.app;
+
+  if(process.env.IS_CLIENT){
+    saveData('project', project);
+    setParam(PROJECT, project);
+  }
+
+  return dispatch({
+    type: SET_PROJECT,
+    payload: project,
+  });
+};
 
 const setProjects = projects => ({
   type: SET_PROJECTS,
