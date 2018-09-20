@@ -55,10 +55,10 @@ export default routeWrapper.bind(null, (req, res) => {
     BLUE_END,
   } = require('UTILS/logger');
   const awaitSSRData = require('UTILS/awaitSSRData').default;
-  
+
   const { dispatch, getState } = store.app;
   const { query } = req;
-  
+
   const isDev = process.env.NODE_ENV === 'development';
 
   // if a relative file request makes it here, it's most likely an error
@@ -75,7 +75,7 @@ export default routeWrapper.bind(null, (req, res) => {
     const projects = ( !err && stat.isDirectory() )
       ? readdirSync(appConfig.paths.PROJECTS)
       : [];
-      
+
     awaitSSRData(
       req.url,
       req.params,
@@ -85,7 +85,18 @@ export default routeWrapper.bind(null, (req, res) => {
       // Need to set this regardless if it's empty. Otherwise the state could
       // persist in watch mode even if the directory doesn't exist.
       dispatch( setProjects(projects) );
-      if( query[PROJECT] ) dispatch( setProject(query[PROJECT]) );
+      // Account for users entering random queries
+      const projectParam = query[PROJECT];
+      try {
+        if(
+          projectParam
+          && statSync(`${ appConfig.paths.PROJECTS }/${ projectParam }`).isDirectory()
+        ){
+          setProject(projectParam);
+        }
+      }catch(err){
+        setProject('');
+      }
 
       let modules = [];
       const captureSSRChunks = (moduleName) => modules.push(moduleName);
