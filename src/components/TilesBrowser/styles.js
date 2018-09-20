@@ -18,7 +18,6 @@ const styles = {
 
       ' button': {
         color: '#eee',
-        fontSize: '1.5em',
         padding: '0em 0.15em 0.15em 0.15em',
         background: 'transparent',
       },

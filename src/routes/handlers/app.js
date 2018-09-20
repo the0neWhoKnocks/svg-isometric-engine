@@ -4,20 +4,24 @@ import glob from 'glob';
 import { paths } from 'SRC/../conf.app';
 import routeWrapper from 'UTILS/routeWrapper';
 
-// TODO - For now just dumping all sprites. This should be trimmed down to just
-// what's needed.
 let svgSprites = '';
 glob.sync('**/*.svg', {
   cwd: resolve(__dirname, `${ paths.DIST_PUBLIC }/svgs`),
 }).forEach((fileName) => {
   let svg = readFileSync(`${ paths.DIST_PUBLIC }/svgs/${ fileName }`, 'utf8');
-  svg = svg.replace('<?xml version="1.0" encoding="utf-8"?>', '');
-  svg = svg.replace(
-    '<svg ',
-    '<svg style="display:none; position:absolute" width="0" height="0" style="position:absolute" '
-  );
+  svg = svg
+    .replace(
+      '<svg',
+      `<symbol id="${ fileName.replace('.svg', '') }"`
+    )
+    .replace('</svg>', '</symbol>');
   svgSprites += svg;
 });
+svgSprites = `
+<svg style="display:none; position:absolute" width="0" height="0">
+  ${ svgSprites }
+</svg>
+`;
 
 export default routeWrapper.bind(null, (req, res) => {
   const {

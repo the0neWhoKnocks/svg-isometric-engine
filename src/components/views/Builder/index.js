@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import { arrayOf, number, shape, string } from 'prop-types';
 import { connect } from 'react-redux';
 import SplitPane from 'react-split-pane';
@@ -18,6 +18,7 @@ import {
 import store from 'STATE/store';
 import { get as getData } from 'UTILS/storage';
 import CreateProject from './components/CreateProject';
+import TopNav from './components/TopNav';
 import styles, { globals as globalStyles } from './styles';
 
 const builderProps = (state) => ({
@@ -62,58 +63,59 @@ class Builder extends Component {
   render() {
     const {
       dialogError,
-      project,
       projects,
     } = this.props;
     const {
       mounted,
     } = this.state;
-    const projectText = (project) ? ` / ${ project }` : '';
 
     return (
       <div className={`${ styles.root }`}>
         { mounted && (
-          <SplitPane split="vertical">
-            <Pane initialSize="75%">
-              <SplitPane split="horizontal">
-                <Pane>Builder{ projectText }</Pane>
-                <Pane>Preview</Pane>
-              </SplitPane>
-            </Pane>
-            <Pane>
-              <div className={`${ styles.rail }`}>
-                <nav>
-                  <button>Load</button>
-                  <button>Save</button>
-                  <button>Undo</button>
-                  <button>Redo</button>
-                </nav>
-                <Tabs
-                  className={`${ styles.tabs }`}
-                  items={[
-                    {
-                      content: <TilesBrowser />,
-                      icon: 'collections',
-                      label: 'Tiles',
-                    },
-                    {
-                      content: <Layers />,
-                      icon: 'layers',
-                      label: 'Layers',
-                    },
-                  ]}
-                />
-              </div>
-            </Pane>
-          </SplitPane>
-        )}
-        {!projects.length && (
-          <Dialog
-            error={ dialogError }
-            modal opened disableClose
-          >
-            <CreateProject />
-          </Dialog>
+          <Fragment>
+            <TopNav />
+            <SplitPane split="vertical">
+              <Pane initialSize="75%">
+                <SplitPane split="horizontal">
+                  <Pane>Builder</Pane>
+                  <Pane>Preview</Pane>
+                </SplitPane>
+              </Pane>
+              <Pane>
+                <div className={`${ styles.rail }`}>
+                  <nav>
+                    <button>Load</button>
+                    <button>Save</button>
+                    <button>Undo</button>
+                    <button>Redo</button>
+                  </nav>
+                  <Tabs
+                    className={`${ styles.tabs }`}
+                    items={[
+                      {
+                        content: <TilesBrowser />,
+                        icon: 'photo_library',
+                        label: 'Tiles',
+                      },
+                      {
+                        content: <Layers />,
+                        icon: 'layers',
+                        label: 'Layers',
+                      },
+                    ]}
+                  />
+                </div>
+              </Pane>
+            </SplitPane>
+            {!projects.length && (
+              <Dialog
+                error={ dialogError }
+                modal opened disableClose
+              >
+                <CreateProject />
+              </Dialog>
+            )}
+          </Fragment>
         )}
       </div>
     );

@@ -19,6 +19,8 @@ const gutterSize = '11px';
 const styles = {
   root: css({
     height: '100%',
+    display: 'flex',
+    flexDirection: 'column',
 
     ' [data-type="SplitPane"]': {
       '[data-split="horizontal"] > div': {
