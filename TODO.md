@@ -13,6 +13,12 @@
         - [x] Create a `tiles` directory.
     - Set a localStorage entry to:
       - [x] Maintain project name for later load.
+  - Add state for Dialog, so that:
+    - [ ] It only appears while on the Client.
+    - [ ] Or have a check that the current `content` is just a `string` and not
+      a `node`. If it's a `string` it's ok to be rendered/hydrated via the
+      server. If it is a `node`, hydration will blow up on the Client because
+      component functions could get eval'd out of order.
 - **Top Nav**
   - File:
     - Load:
