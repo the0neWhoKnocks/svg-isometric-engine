@@ -5,8 +5,8 @@ import classnames from 'classnames';
 import Spinner from 'COMPONENTS/Spinner';
 import {
   setScrollPos,
-} from 'STATE/actions';
-import { getScrollPos } from 'STATE/selectors';
+} from 'STATE/App/actions';
+import { getScrollPos } from 'STATE/App/selectors';
 import styles from './styles';
 
 

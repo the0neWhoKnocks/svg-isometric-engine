@@ -1,14 +1,11 @@
-const NAME = 'Builder';
-const initialState = () => ({
-  dialogError: undefined,
+const NAME = 'App';
+const initialState = {
   nextPage: undefined,
   previousView: undefined,
-  project: '',
-  projects: [],
   shellClass: '',
   scrollPos: {},
   viewData: {},
-});
+};
 
 export {
   NAME,

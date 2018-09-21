@@ -3,25 +3,25 @@ import { arrayOf, number, shape, string } from 'prop-types';
 import { connect } from 'react-redux';
 import SplitPane from 'react-split-pane';
 import Pane from 'react-split-pane/lib/Pane';
-import Dialog from 'COMPONENTS/Dialog';
 import Layers from 'COMPONENTS/Layers';
 import Tabs from 'COMPONENTS/Tabs';
 import TilesBrowser from 'COMPONENTS/TilesBrowser';
 import {
   setProject,
-} from 'STATE/actions';
+} from 'STATE/Builder/actions';
 import {
-  getDialogError,
   getProject,
   getProjects,
-} from 'STATE/selectors';
+} from 'STATE/Builder/selectors';
+import {
+  openModal,
+} from 'STATE/Dialog/actions';
 import { get as getData } from 'UTILS/storage';
 import CreateProject from './components/CreateProject';
 import TopNav from './components/TopNav';
 import styles, { globals as globalStyles } from './styles';
 
 const builderProps = (state) => ({
-  dialogError: getDialogError(state),
   project: getProject(state),
   projects: getProjects(state),
 });
@@ -38,20 +38,31 @@ class Builder extends Component {
   }
 
   componentDidMount() {
+    const {
+      project,
+      projects,
+    } = this.props;
+
     if(
       // there are projects to reference
-      this.props.projects.length
+      projects.length
       // a project hasn't already been specified (in the URL)
-      && !this.props.project
+      && !project
     ){
-      const project = getData('project');
+      const _project = getData('project');
 
       if(
         // a project was previously chosen
-        project
+        _project
         // that project exists
-        && this.props.projects.includes(project)
-      ) setProject(project);
+        && projects.includes(_project)
+      ) setProject(_project);
+    }
+    else if( !projects.length ){
+      openModal({
+        children: <CreateProject />,
+        disableClose: true,
+      });
     }
 
     this.setState({
@@ -60,10 +71,6 @@ class Builder extends Component {
   }
 
   render() {
-    const {
-      dialogError,
-      projects,
-    } = this.props;
     const {
       mounted,
     } = this.state;
@@ -106,14 +113,6 @@ class Builder extends Component {
                 </div>
               </Pane>
             </SplitPane>
-            {!projects.length && (
-              <Dialog
-                error={ dialogError }
-                modal opened disableClose
-              >
-                <CreateProject />
-              </Dialog>
-            )}
           </Fragment>
         )}
       </div>

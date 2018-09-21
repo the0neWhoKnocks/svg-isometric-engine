@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { CREATE_PROJECT } from 'CONSTANTS/routePaths';
 import {
   createProject,
-} from 'STATE/actions';
+} from 'STATE/Builder/actions';
 import styles from './styles';
 
 class CreateProject extends Component {

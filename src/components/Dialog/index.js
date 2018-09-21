@@ -4,13 +4,34 @@ import SvgIcon from 'COMPONENTS/SvgIcon';
 import styles from './styles';
 
 class Dialog extends Component {
+  static getDerivedStateFromProps(props, state){
+    const { error, opened } = props;
+
+    if(
+      opened !== state.opened
+      || error !== state.error
+    ) return {
+      error,
+      opened,
+    };
+
+    return null;
+  }
+
   constructor(props) {
     super();
 
     this.state = {
-      opened: props.opened || false,
+      mounted: false,
+      opened: props.opened,
     };
     this.handleClose = this.handleClose.bind(this);
+  }
+
+  componentDidMount() {
+    this.setState({
+      mounted: true,
+    });
   }
 
   handleClose() {
@@ -26,9 +47,12 @@ class Dialog extends Component {
       error,
       modal,
     } = this.props;
-    const { opened } = this.state;
+    const {
+      mounted,
+      opened,
+    } = this.state;
 
-    if(!opened) return null;
+    if(!mounted || !opened) return null;
 
     return (
       <div className={`dialog ${ styles.absFill } ${ styles.root }`}>
@@ -67,6 +91,9 @@ Dialog.propTypes = {
   }),
   modal: bool,
   opened: bool,
+};
+Dialog.defaultProps = {
+  opened: false,
 };
 
 export default Dialog;

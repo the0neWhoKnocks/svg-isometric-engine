@@ -6,7 +6,7 @@ import { withRouter } from 'react-router';
 import ViewTransition from 'COMPONENTS/ViewTransition';
 import {
   setShellClass,
-} from 'STATE/actions';
+} from 'STATE/App/actions';
 import styles, {
   animDuration,
 } from './styles';
