@@ -1,7 +1,7 @@
 import axios from 'axios';
 import {
   getViewData,
-} from 'STATE/selectors';
+} from 'STATE/App/selectors';
 import store from 'STATE/store';
 import genCacheKey from 'UTILS/genCacheKey';
 import logger, {

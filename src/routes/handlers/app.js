@@ -42,10 +42,12 @@ export default routeWrapper.bind(null, (req, res) => {
   const AppShell = require('SERVER/views/AppShell');
   const loadableStats = require('SRC/react-loadable.json');
   const {
+    setShellClass,
+  } = require('STATE/App/actions');
+  const {
     setProject,
     setProjects,
-    setShellClass,
-  } = require('STATE/actions');
+  } = require('STATE/Builder/actions');
   const { default: store } = require('STATE/store');
   const {
     default: log,
@@ -93,6 +95,8 @@ export default routeWrapper.bind(null, (req, res) => {
           && statSync(`${ appConfig.paths.PROJECTS }/${ projectParam }`).isDirectory()
         ){
           setProject(projectParam);
+        }else{
+          setProject('');
         }
       }catch(err){
         setProject('');

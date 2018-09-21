@@ -4,7 +4,7 @@ import { arrayOf, func, object, oneOfType, shape, string } from 'prop-types';
 import getData from 'UTILS/getData';
 import genCacheKey from 'UTILS/genCacheKey';
 import replaceUrlToken from 'UTILS/replaceUrlToken';
-import { getViewData } from 'STATE/selectors';
+import { getViewData } from 'STATE/App/selectors';
 
 const mapStateToProps = (state) => ({
   getViewData: (key) => getViewData(state, key),

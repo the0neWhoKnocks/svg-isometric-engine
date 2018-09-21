@@ -7,11 +7,11 @@ import Flyout, {
 import SvgIcon from 'COMPONENTS/SvgIcon';
 import {
   setProject,
-} from 'STATE/actions';
+} from 'STATE/Builder/actions';
 import {
   getProject,
   getProjects,
-} from 'STATE/selectors';
+} from 'STATE/Builder/selectors';
 import styles from './styles';
 
 const navProps = (state) => ({

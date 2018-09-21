@@ -2,6 +2,7 @@ import React from 'react';
 import { connect, Provider } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import { arrayOf, node, shape, string } from 'prop-types';
+import Dialog from 'COMPONENTS/Dialog';
 import defaultFooter from 'COMPONENTS/Footer';
 import defaultHeader from 'COMPONENTS/Header';
 import defaultMain from 'COMPONENTS/Main';
@@ -13,7 +14,14 @@ import {
 import store from 'STATE/store';
 import {
   getShellClass,
-} from 'STATE/selectors';
+} from 'STATE/App/selectors';
+import {
+  getContent,
+  getError,
+  hasCloseDisabled,
+  isModal,
+  isOpened,
+} from 'STATE/Dialog/selectors';
 import './styles';
 
 
@@ -36,6 +44,13 @@ else{
 
 const mapStateToProps = (state) => ({
   shellClass: getShellClass(state),
+});
+const dialogProps = (state) => ({
+  children: getContent(state),
+  error: getError(state),
+  disableClose: hasCloseDisabled(state),
+  modal: isModal(state),
+  opened: isOpened(state),
 });
 
 const ShellWrap = ({
@@ -70,7 +85,8 @@ const composeShell = (
     }
 
     const ConnectedShell = withRouter(connect(mapStateToProps)(ShellWrap));
-    
+    const ConnectedDialog = withRouter(connect(dialogProps)(Dialog));
+
     return (
       <Provider store={ store.app }>
         <Router { ...routerProps }>
@@ -78,6 +94,7 @@ const composeShell = (
             <Header navItems={ headerNavItems } />
             <Main routes={ CLIENT_ROUTES } />
             <Footer navItems={ footerNavItems } />
+            <ConnectedDialog />
           </ConnectedShell>
         </Router>
       </Provider>

@@ -1,6 +1,10 @@
-import { applyMiddleware, compose, createStore } from 'redux';
+import {
+  applyMiddleware,
+  compose,
+  createStore,
+} from 'redux';
 import thunk from 'redux-thunk';
-import reducer from './reducer';
+import reducers from './reducers';
 
 let extraArgs = [];
 
@@ -23,9 +27,9 @@ if(process.env.IS_CLIENT){
 const _default = {
   app: null,
 };
-const initStore = ({ reducerArgs = [] } = {}) => {
+const initStore = () => {
   _default.app = createStore(
-    reducer(...reducerArgs), // apply any initial state props if neccessary
+    reducers,
     ...extraArgs
   );
 };
