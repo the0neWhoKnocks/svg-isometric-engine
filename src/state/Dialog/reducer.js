@@ -7,7 +7,7 @@ import {
   SET_ERROR,
 } from './actionTypes';
 
-export default (state = initialState, action) => {
+export default (state = initialState, action = {}) => {
   const { payload, type } = action;
 
   switch( type ){

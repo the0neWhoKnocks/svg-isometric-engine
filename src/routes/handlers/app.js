@@ -84,10 +84,8 @@ export default routeWrapper.bind(null, (req, res) => {
       CLIENT_ROUTES,
     ).then(() => {
       dispatch( setShellClass({ pathname: req.path }) );
-      // Need to set this regardless if it's empty. Otherwise the state could
-      // persist in watch mode even if the directory doesn't exist.
-      dispatch( setProjects(projects) );
-      // Account for users entering random queries
+      if(projects.length) dispatch( setProjects(projects) );
+      // Account for users entering random queries by ensuring project folder exists
       const projectParam = query[PROJECT];
       try {
         if(
@@ -95,12 +93,8 @@ export default routeWrapper.bind(null, (req, res) => {
           && statSync(`${ appConfig.paths.PROJECTS }/${ projectParam }`).isDirectory()
         ){
           setProject(projectParam);
-        }else{
-          setProject('');
         }
-      }catch(err){
-        setProject('');
-      }
+      }catch(err){ /* I don't care about stat errors */ }
 
       let modules = [];
       const captureSSRChunks = (moduleName) => modules.push(moduleName);

@@ -11,7 +11,7 @@ import {
   SET_VIEW_DATA,
 } from './actionTypes';
 
-export default (state = initialState, action) => {
+export default (state = initialState, action = {}) => {
   const { payload, type } = action;
 
   switch( type ){
