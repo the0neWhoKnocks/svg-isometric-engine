@@ -6,6 +6,7 @@ import Dialog from 'COMPONENTS/Dialog';
 import defaultFooter from 'COMPONENTS/Footer';
 import defaultHeader from 'COMPONENTS/Header';
 import defaultMain from 'COMPONENTS/Main';
+import NoScript from 'COMPONENTS/NoScript';
 import { CLIENT_ROUTES } from 'ROUTES';
 import {
   headerNavItems as defaultHeaderNavItems,
@@ -95,6 +96,9 @@ const composeShell = (
             <Main routes={ CLIENT_ROUTES } />
             <Footer navItems={ footerNavItems } />
             <ConnectedDialog />
+            <NoScript>
+              Javascript should be enabled in order to use this app properly.
+            </NoScript>
           </ConnectedShell>
         </Router>
       </Provider>
