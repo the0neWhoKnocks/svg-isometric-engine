@@ -20,12 +20,14 @@ export default (state = initialState, action) => {
     }
 
     case CLOSE: {
+      reducerLogger(type, 'CLOSE', ['Dialog']);
       return {
         ...initialState,
       };
     }
 
     case OPEN_MODAL: {
+      reducerLogger(type, 'OPEN', ['Dialog']);
       return {
         ...state,
         ...payload,

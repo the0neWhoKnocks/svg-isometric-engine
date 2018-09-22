@@ -43,7 +43,13 @@ class CreateProject extends Component {
         <br />
         Enter a name for a new project below.
         <div className={`${ styles.inputContainer }`}>
-          <input type="text" name="projectName" required />
+          <input
+            type="text"
+            name="projectName"
+            autoFocus
+            required
+            ref={(ref) => { this.inputRef = ref; }}
+          />
           <button>Create</button>
         </div>
       </form>
