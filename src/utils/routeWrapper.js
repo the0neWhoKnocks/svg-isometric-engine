@@ -1,3 +1,5 @@
+import { RESET_STATE } from 'CONSTANTS/misc';
+import store from 'STATE/store';
 import log, {
   BLACK_ON_GREEN,
   BLUE,
@@ -17,6 +19,9 @@ export default (next, req, res) => {
     req.route.path !== '*'
     && req._parsedUrl.pathname !== req.route.path
   ) args.push(`\n${ JSON.stringify(req.params, null, 2) }`);
+
+  // resets all reducer states
+  store.app.dispatch({ type: RESET_STATE });
 
   log(...args);
   next(req, res);

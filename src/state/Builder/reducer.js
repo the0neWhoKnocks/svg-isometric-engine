@@ -8,7 +8,7 @@ import {
   SET_PROJECTS,
 } from './actionTypes';
 
-export default (state = initialState, action) => {
+export default (state = initialState, action = {}) => {
   const { payload, type } = action;
 
   switch( type ){
