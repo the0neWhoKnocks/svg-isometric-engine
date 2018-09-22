@@ -38,7 +38,7 @@ const createProject = opts => {
 const setProject = project => {
   const { dispatch } = store.app;
 
-  if(process.env.IS_CLIENT){
+  if(ON_CLIENT){
     saveData('project', project);
     setParam(PROJECT, project);
   }

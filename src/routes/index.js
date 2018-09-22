@@ -23,7 +23,7 @@ let routes = {
 // Dynamically set up all routes
 const CONFIGS_DIR = './configs';
 
-if( process.env.IS_CLIENT ){
+if( ON_CLIENT ){
   // NOTE - WP does a static analysis of all `require.context` calls so the
   // configs path has to be hard-coded here.
   const configs = require.context('./configs', false, /\.js$/);

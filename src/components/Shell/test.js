@@ -6,8 +6,8 @@ describe('Shell', () => {
     mapStateToProps, ShellWrap;
 
   const setupEnv = (isClient) => {
-    if(isClient) process.env.IS_CLIENT = 'true';
-    else delete process.env.IS_CLIENT;
+    if(isClient) global.ON_CLIENT = 'true';
+    else delete global.ON_CLIENT;
 
     index = require('./index');
     store = require('STATE/store').default;

@@ -11,7 +11,7 @@ const ROUTE = {
   },
 };
 
-if( process.env.IS_SERVER ){
+if( ON_SERVER ){
   ROUTE.handler = require('ROUTES/handlers/app').default;
 }
 
