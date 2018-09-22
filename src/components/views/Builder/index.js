@@ -27,12 +27,19 @@ const builderProps = (state) => ({
 });
 
 class Builder extends Component {
-  constructor() {
+  constructor(props) {
     super();
 
     this.state = {
       mounted: false,
     };
+
+    if( !props.projects.length ){
+      openModal({
+        children: <CreateProject />,
+        disableClose: true,
+      });
+    }
 
     globalStyles();
   }
@@ -58,12 +65,6 @@ class Builder extends Component {
         && projects.includes(_project)
       ) setProject(_project);
     }
-    else if( !projects.length ){
-      openModal({
-        children: <CreateProject />,
-        disableClose: true,
-      });
-    }
 
     this.setState({
       mounted: true,
@@ -72,8 +73,13 @@ class Builder extends Component {
 
   render() {
     const {
+      projects,
+    } = this.props;
+    const {
       mounted,
     } = this.state;
+
+    if( !projects.length ) return null;
 
     return (
       <div className={`${ styles.root }`}>

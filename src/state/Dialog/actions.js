@@ -1,4 +1,5 @@
 import store from 'STATE/store';
+import sanitizeJsxForState from 'UTILS/sanitizeJsxForState';
 import {
   CLEAR_ERROR,
   CLOSE,
@@ -13,12 +14,15 @@ export const clearError = () => {
 };
 
 export const openModal = (dialogProps) => {
+  const transformedProps = { ...dialogProps };
+  transformedProps.children = sanitizeJsxForState(transformedProps.children);
+
   store.app.dispatch({
     type: OPEN_MODAL,
     payload: {
       modal: true,
       opened: true,
-      ...dialogProps,
+      ...transformedProps,
     },
   });
 };

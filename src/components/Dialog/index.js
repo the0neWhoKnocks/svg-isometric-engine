@@ -1,4 +1,5 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
 import { bool, node, number, shape, string } from 'prop-types';
 import SvgIcon from 'COMPONENTS/SvgIcon';
 import styles from './styles';
@@ -48,11 +49,40 @@ class Dialog extends Component {
       modal,
     } = this.props;
     const {
-      mounted,
       opened,
     } = this.state;
+    const contentProps = {};
+    const contentChildren = [];
 
-    if(!mounted || !opened) return null;
+    if(!opened) return null;
+
+    // errors go first
+    if( error ){
+      contentChildren.push(
+        <div className={`${ styles.errorMsg }`}>{ error.data }</div>
+      );
+    }
+    // then any other content
+    contentChildren.push(children);
+
+    // Render all content children (errors, etc) if `children` is a String.
+    // The common use case for `children` being a String is if the Server
+    // needed to render a Dialog and the state was set to a String.
+    if( typeof children === 'string' ){
+      contentProps.dangerouslySetInnerHTML = {
+        __html: contentChildren.map((i) => {
+          return (typeof i !== 'string') ? renderToStaticMarkup(i) : i;
+        }).join(''),
+      };
+    }
+    // The rest of the time `children` should be a JSX Object. In order to
+    // use an Array, Fragment has to be used otherwise warnings are thrown
+    // about "missing unique keys".
+    else{
+      contentProps.children = contentChildren.map((I, ndx) => {
+        return <Fragment key={ndx}>{I}</Fragment>;
+      });
+    }
 
     return (
       <div className={`dialog ${ styles.absFill } ${ styles.root }`}>
@@ -69,12 +99,10 @@ class Dialog extends Component {
               <SvgIcon name="close" />
             </button>
           </nav>
-          <div className={`dialog__content ${ styles.content }`}>
-            { error && (
-              <div className={`${ styles.errorMsg }`}>{ error.data }</div>
-            )}
-            { children }
-          </div>
+          <div
+            className={`dialog__content ${ styles.content }`}
+            { ...contentProps }
+          />
         </div>
       </div>
     );
