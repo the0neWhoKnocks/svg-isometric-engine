@@ -46,8 +46,8 @@ const conf = {
           config: './.webpack/conf.webpack.js',
         }],
         ['transform-define', {
-          'process.env.IS_CLIENT': false,
-          'process.env.IS_SERVER': true,
+          'ON_CLIENT': false,
+          'ON_SERVER': true,
         }],
         'dynamic-import-node',
         ['import-inspector', {

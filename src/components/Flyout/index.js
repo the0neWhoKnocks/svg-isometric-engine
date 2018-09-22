@@ -21,7 +21,7 @@ class Flyout extends Component {
     this.handleBtnHover = this.handleBtnHover.bind(this);
     this.handleBtnLeave = this.handleBtnLeave.bind(this);
 
-    if(process.env.IS_CLIENT){
+    if(ON_CLIENT){
       if(!window.flyout) window.flyout = {
         closeAll: this.closeAll,
       };

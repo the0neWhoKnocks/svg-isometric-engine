@@ -6,7 +6,7 @@ export default function logger() {
   let transformer;
   let transform;
 
-  if(process.env.IS_CLIENT){
+  if(ON_CLIENT){
     // transformer = (getCookie('logging'))
     //   ? import(/* webpackChunkName: "clientLogger" */ './clientTransform')
     //   : Promise.resolve({ default: () => {} });
@@ -28,7 +28,7 @@ export default function logger() {
       const result = transform(arg);
 
       if(result){
-        if( process.env.IS_CLIENT ) styles.push(...result.styles);
+        if( ON_CLIENT ) styles.push(...result.styles);
         msg.push(result.text);
       }
     });

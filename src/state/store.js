@@ -8,7 +8,7 @@ import reducers from './reducers';
 
 let extraArgs = [];
 
-if(process.env.IS_CLIENT){
+if(ON_CLIENT){
   let state = {};
 
   // hydrate state from server

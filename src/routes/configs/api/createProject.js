@@ -5,7 +5,7 @@ const ROUTE = {
   path: CREATE_PROJECT,
 };
 
-if( process.env.IS_SERVER ){
+if( ON_SERVER ){
   ROUTE.handler = require('ROUTES/handlers/api/createProject').default;
 }
 

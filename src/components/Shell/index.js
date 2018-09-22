@@ -26,7 +26,7 @@ import './styles';
 
 
 let Router;
-if( process.env.IS_CLIENT ){
+if( ON_CLIENT ){
   /**
    * Normally `process.env` is only available in node, but utilizing the
    * DefinePlugin allows us to expose certain variables, and in turn, during
