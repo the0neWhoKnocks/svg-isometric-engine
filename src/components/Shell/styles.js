@@ -23,6 +23,10 @@ css.insert(`
     margin-top: 0;
   }
 
+  button {
+    cursor: pointer;
+  }
+
   .root,
   .shell {
     height: 100%;

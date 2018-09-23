@@ -19,11 +19,10 @@ const createProject = opts => {
   return axios[method](url, body)
     .then((resp) => {
       const { data: { projects } } = resp;
-      const currProject = projects[0];
 
       closeDialog();
       dispatch( setProjects(projects) );
-      setProject(currProject);
+      setProject(body.projectName);
     })
     .catch((err) => {
       const { data, status, statusText } = err.response;
