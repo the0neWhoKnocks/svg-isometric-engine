@@ -18,6 +18,7 @@ import {
 } from 'STATE/Dialog/actions';
 import { get as getData } from 'UTILS/storage';
 import CreateProject from './components/CreateProject';
+import ProjectSelector from './components/ProjectSelector';
 import TopNav from './components/TopNav';
 import styles, { globals as globalStyles } from './styles';
 
@@ -36,7 +37,7 @@ class Builder extends Component {
 
     if( !props.projects.length ){
       openModal({
-        children: <CreateProject />,
+        children: <CreateProject isFirst />,
         disableClose: true,
       });
     }
@@ -73,6 +74,7 @@ class Builder extends Component {
 
   render() {
     const {
+      project,
       projects,
     } = this.props;
     const {
@@ -83,7 +85,10 @@ class Builder extends Component {
 
     return (
       <div className={`${ styles.root }`}>
-        { mounted && (
+        {(mounted && !project) && (
+          <ProjectSelector projects={ projects } />
+        )}
+        {(mounted && project) && (
           <Fragment>
             <TopNav />
             <SplitPane split="vertical">

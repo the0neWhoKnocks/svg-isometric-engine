@@ -15,16 +15,16 @@
       - [x] Maintain project name for later load.
   - Add state for Dialog, so that:
     - [x] It only appears while on the Client.
-    - [ ] Or have a check that the current `content` is just a `string` and not
+    - [x] Or have a check that the current `content` is just a `string` and not
       a `node`. If it's a `string` it's ok to be rendered/hydrated via the
       server. If it is a `node`, hydration will blow up on the Client because
       component functions could get eval'd out of order.
 - **Top Nav**
   - File:
     - Load:
-      - [ ] Text is not grayed out, and there's a side arrow that'll expand a
+      - [x] Text is not grayed out, and there's a side arrow that'll expand a
         list of previous projects to choose from.
-        - [ ] Updates state and storage with selected project.
+        - [x] Updates state and storage with selected project.
     - [ ] Import
       - [ ] Uploads a `zip` file to the `projects` directory and expands it.
       - [ ] Loads the imported project.
@@ -34,6 +34,8 @@
 ## Tile Builder
 
 - [ ] **GUI**
+  - [x] If a query exists in the URL for a project that doesn't exist, display
+    a list of possible projects.
   - On Server:
     - Handle query params:
       - [x] If `proj` is set, update `project` state.
