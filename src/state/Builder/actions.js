@@ -1,3 +1,4 @@
+import { PROJECT_DATA } from 'CONSTANTS/routePaths';
 import { PROJECT } from 'CONSTANTS/queryParams';
 import { add as saveData } from 'UTILS/storage';
 import setParam from 'UTILS/setParam';
@@ -14,15 +15,19 @@ import {
 const createProject = opts => {
   const axios = require('axios');
   const { body, method, url } = opts;
-  const { dispatch } = store.app;
 
   return axios[method](url, body)
     .then((resp) => {
-      const { data: { projects } } = resp;
+      const {
+        data: {
+          project,
+          projects,
+        },
+      } = resp;
 
       closeDialog();
-      dispatch( setProjects(projects) );
-      setProject(body.projectName);
+      setProjects(projects);
+      setProject(project);
     })
     .catch((err) => {
       const { data, status, statusText } = err.response;
@@ -34,12 +39,27 @@ const createProject = opts => {
     });
 };
 
-const setProject = project => {
+const fetchProject = (uid) => {
+  const axios = require('axios');
+  const params = { uid };
+
+  return axios.get(PROJECT_DATA, { params })
+    .then((resp) => {
+      const { data: { project } } = resp;
+
+      setProject(project);
+    })
+    .catch((err) => {
+      console.error(err);
+    });
+};
+
+const setProject = (project) => {
   const { dispatch } = store.app;
 
   if(ON_CLIENT){
     saveData('project', project);
-    setParam(PROJECT, project);
+    setParam(PROJECT, project.uid);
   }
 
   return dispatch({
@@ -48,13 +68,18 @@ const setProject = project => {
   });
 };
 
-const setProjects = projects => ({
-  type: SET_PROJECTS,
-  payload: projects,
-});
+const setProjects = (projects) => {
+  const { dispatch } = store.app;
+
+  return dispatch({
+    type: SET_PROJECTS,
+    payload: projects,
+  });
+};
 
 export {
   createProject,
+  fetchProject,
   setProject,
   setProjects,
 };

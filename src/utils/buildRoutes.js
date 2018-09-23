@@ -7,10 +7,11 @@
  * @param {Object} routes - The current routes
  */
 export default (conf, name, routes) => {
+  const transformedName = name.replace('./', '').replace('.js', '');
+
   Object.keys(conf).forEach(type => {
     // `types` will be `get`, `post`, etc.
     conf[type].forEach(route => {
-      const transformedName = name.replace('./', '').replace('.js', '');
       // Assign the file name as the key so it can be easily accessed and
       // references stay associated through out the project in case of
       // refactors.

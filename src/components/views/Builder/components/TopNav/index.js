@@ -1,12 +1,16 @@
 import React, { Component, Fragment } from 'react';
 import { connect } from 'react-redux';
-import { arrayOf, func, string } from 'prop-types';
+import { func } from 'prop-types';
 import Flyout, {
   RIGHT,
 } from 'COMPONENTS/Flyout';
 import SvgIcon from 'COMPONENTS/SvgIcon';
 import {
-  setProject,
+  PROJECT,
+  PROJECTS,
+} from 'CONSTANTS/propTypes';
+import {
+  fetchProject,
 } from 'STATE/Builder/actions';
 import {
   getProject,
@@ -19,7 +23,7 @@ const navProps = (state) => ({
   projects: getProjects(state),
 });
 const navActions = () => ({
-  setProject,
+  fetchProject,
 });
 
 class TopNav extends Component {
@@ -30,7 +34,12 @@ class TopNav extends Component {
   }
 
   handleProjectSelect(ev) {
-    this.props.setProject( ev.currentTarget.dataset.project );
+    const {
+      projects,
+      fetchProject,
+    } = this.props;
+    const projectNdx = ev.currentTarget.dataset.project;
+    fetchProject( projects[projectNdx].uid );
     window.flyout.closeAll();
   }
 
@@ -44,7 +53,7 @@ class TopNav extends Component {
       <nav className={`${ styles.root }`}>
         <Flyout
           id="topNavFileBtn"
-          label="File"
+          label="Projects"
         >
           <Flyout
             btnClass="has--icon"
@@ -52,7 +61,7 @@ class TopNav extends Component {
             id="fileSubNavLoadBtn"
             label={(
               <Fragment>
-                Load
+                Open
                 <SvgIcon name="arrow_right" />
               </Fragment>
             )}
@@ -63,23 +72,26 @@ class TopNav extends Component {
                 key={ ndx }
                 className={`${ styles.projectBtns }`}
                 onClick={ this.handleProjectSelect }
-                data-project={ project }
-              >{`projects/ ${ project }`}</button>
+                data-project={ ndx }
+              >{`projects/ ${ project.name }`}</button>
             ))}
           </Flyout>
+          <button>Rename</button>
+          <button>Save</button>
+          <button>Save As</button>
           <button>Import</button>
           <button>Export</button>
         </Flyout>
-        <div className={`${ styles.projectTitle }`}>{ project }</div>
+        <div className={`${ styles.projectTitle }`}>{ project.name }</div>
       </nav>
     );
   }
 }
 
 TopNav.propTypes = {
-  project: string,
-  projects: arrayOf(string),
-  setProject: func,
+  fetchProject: func,
+  project: PROJECT,
+  projects: PROJECTS,
 };
 
 export default connect(navProps, navActions)(TopNav);

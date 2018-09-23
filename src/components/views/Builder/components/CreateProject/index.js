@@ -1,5 +1,4 @@
-import React, { Component, Fragment } from 'react';
-import { bool } from 'prop-types';
+import React, { Component } from 'react';
 import { CREATE_PROJECT } from 'CONSTANTS/routePaths';
 import {
   createProject,
@@ -33,10 +32,6 @@ class CreateProject extends Component {
   }
 
   render() {
-    const {
-      isFirst,
-    } = this.props;
-
     return (
       <form
         className={`create-project ${ styles.root }`}
@@ -44,12 +39,6 @@ class CreateProject extends Component {
         action={ CREATE_PROJECT }
         onSubmit={ this.handleSubmit }
       >
-        { isFirst && (
-          <Fragment>
-            No projects have been detected.
-            <br />
-          </Fragment>
-        )}
         Enter a name for a new project below.
         <div className={`create-project__input-container ${ styles.inputContainer }`}>
           <input
@@ -65,12 +54,5 @@ class CreateProject extends Component {
     );
   }
 }
-
-CreateProject.propTypes = {
-  isFirst: bool,
-};
-CreateProject.defaultProps = {
-  isFirst: false,
-};
 
 export default CreateProject;

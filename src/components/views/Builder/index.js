@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react';
-import { arrayOf, number, shape, string } from 'prop-types';
+import { number, shape, string } from 'prop-types';
 import { connect } from 'react-redux';
 import SplitPane from 'react-split-pane';
 import Pane from 'react-split-pane/lib/Pane';
@@ -7,17 +7,17 @@ import Layers from 'COMPONENTS/Layers';
 import Tabs from 'COMPONENTS/Tabs';
 import TilesBrowser from 'COMPONENTS/TilesBrowser';
 import {
-  setProject,
+  PROJECT,
+  PROJECTS,
+} from 'CONSTANTS/propTypes';
+import {
+  fetchProject,
 } from 'STATE/Builder/actions';
 import {
   getProject,
   getProjects,
 } from 'STATE/Builder/selectors';
-import {
-  openModal,
-} from 'STATE/Dialog/actions';
 import { get as getData } from 'UTILS/storage';
-import CreateProject from './components/CreateProject';
 import ProjectSelector from './components/ProjectSelector';
 import TopNav from './components/TopNav';
 import styles, { globals as globalStyles } from './styles';
@@ -34,13 +34,6 @@ class Builder extends Component {
     this.state = {
       mounted: false,
     };
-
-    if( !props.projects.length ){
-      openModal({
-        children: <CreateProject isFirst />,
-        disableClose: true,
-      });
-    }
 
     globalStyles();
   }
@@ -64,7 +57,7 @@ class Builder extends Component {
         _project
         // that project exists
         && projects.includes(_project)
-      ) setProject(_project);
+      ) fetchProject(_project.uid);
     }
 
     this.setState({
@@ -81,11 +74,9 @@ class Builder extends Component {
       mounted,
     } = this.state;
 
-    if( !projects.length ) return null;
-
     return (
       <div className={`${ styles.root }`}>
-        {(mounted && !project) && (
+        {(mounted && (!projects || !project)) && (
           <ProjectSelector projects={ projects } />
         )}
         {(mounted && project) && (
@@ -137,8 +128,8 @@ Builder.propTypes = {
     status: number,
     statusText: string,
   }),
-  project: string,
-  projects: arrayOf(string),
+  project: PROJECT,
+  projects: PROJECTS,
 };
 
 export default connect(builderProps)(Builder);
