@@ -14,7 +14,7 @@ export default (state = initialState, action = {}) => {
   switch( type ){
     case SET_PROJECT: {
       reducerLogger(type, [
-        'project to:', `${ BLUE } "${ payload }"`,
+        'project to:', `${ BLUE } "${ JSON.stringify(payload) }"`,
       ]);
       return {
         ...state,

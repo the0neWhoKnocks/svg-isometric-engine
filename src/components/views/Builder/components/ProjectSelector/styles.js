@@ -31,9 +31,15 @@ const styles = {
     },
   }),
 
+  columnTitle: css({
+    color: '#eee',
+    textShadow: '0px 2px 2px #000',
+  }),
+
   projectList: css({
     display: 'flex',
     flexDirection: 'column',
+    position: 'relative',
 
     ' .projects': {
       color: '#eee',
@@ -53,6 +59,7 @@ const styles = {
           padding: '0.5em',
           border: 'none',
           borderLeft: 'solid 0.5em transparent',
+          marginBottom: '2px',
           cursor: 'pointer',
           background: '#ffffff10',
           transition: 'border-left-color 0.25s',
@@ -62,6 +69,12 @@ const styles = {
           },
         },
       },
+    },
+
+    '.no--projects': {
+      pointerEvents: 'none',
+      userSelect: 'none',
+      opacity: 0.25,
     },
   }),
 };

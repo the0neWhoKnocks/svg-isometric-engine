@@ -20,15 +20,21 @@
       server. If it is a `node`, hydration will blow up on the Client because
       component functions could get eval'd out of order.
 - **Top Nav**
-  - File:
-    - Load:
+  - Projects:
+    - Open:
       - [x] Text is not grayed out, and there's a side arrow that'll expand a
         list of previous projects to choose from.
         - [x] Updates state and storage with selected project.
-    - [ ] Import
+    - Rename:
+      - [ ] Changes the `name` field of the project file.
+    - Save:
+      - [ ] Dumps specific state data to project file.
+    - Save As:
+      - [ ] Duplicate a project and set `name` to user-provided name.
+    - Import:
       - [ ] Uploads a `zip` file to the `projects` directory and expands it.
       - [ ] Loads the imported project.
-    - [ ] Export
+    - Export:
       - [ ] Creates a `zip` of the current project and allows the user to download it.
 
 ## Tile Builder

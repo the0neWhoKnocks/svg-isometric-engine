@@ -25,7 +25,7 @@ svgSprites = `
 
 export default routeWrapper.bind(null, (req, res) => {
   const {
-    readdirSync,
+    readJsonSync,
     stat,
     statSync,
   } = require('fs-extra');
@@ -36,6 +36,7 @@ export default routeWrapper.bind(null, (req, res) => {
   const { renderStatic } = require('glamor/server');
   const serialize = require('serialize-javascript');
   const ClientShell = require('COMPONENTS/Shell').default;
+  const { PROJECT_FILE } = require('CONSTANTS/misc');
   const { PROJECT } = require('CONSTANTS/queryParams');
   const appConfig = require('ROOT/conf.app');
   const { CLIENT_ROUTES } = require('ROUTES');
@@ -57,6 +58,7 @@ export default routeWrapper.bind(null, (req, res) => {
     BLUE_END,
   } = require('UTILS/logger');
   const awaitSSRData = require('UTILS/awaitSSRData').default;
+  const getProjectsList = require('UTILS/getProjectsList').default;
 
   const { dispatch, getState } = store.app;
   const { query } = req;
@@ -73,10 +75,12 @@ export default routeWrapper.bind(null, (req, res) => {
   const faviconModTime = statSync(appConfig.paths.FAVICON).mtimeMs;
 
   // check for existing projects
-  stat(appConfig.paths.PROJECTS, (err, stat) => {
-    const projects = ( !err && stat.isDirectory() )
-      ? readdirSync(appConfig.paths.PROJECTS)
-      : [];
+  stat(appConfig.paths.PROJECTS, async (err, stat) => {
+    let projects;
+
+    if( !err && stat.isDirectory() ){
+      projects = await getProjectsList();
+    }
 
     awaitSSRData(
       req.url,
@@ -84,15 +88,18 @@ export default routeWrapper.bind(null, (req, res) => {
       CLIENT_ROUTES,
     ).then(() => {
       dispatch( setShellClass({ pathname: req.path }) );
-      if(projects.length) dispatch( setProjects(projects) );
+      if(projects) setProjects(projects);
       // Account for users entering random queries by ensuring project folder exists
       const projectParam = query[PROJECT];
       try {
+        const PROJECT_PATH = `${ appConfig.paths.PROJECTS }/${ projectParam }`;
+
         if(
           projectParam
-          && statSync(`${ appConfig.paths.PROJECTS }/${ projectParam }`).isDirectory()
+          && statSync(PROJECT_PATH).isDirectory()
         ){
-          setProject(projectParam);
+          const projectData = readJsonSync(`${ PROJECT_PATH }/${ PROJECT_FILE }`);
+          setProject(projectData);
         }
       }catch(err){ /* I don't care about stat errors */ }
 

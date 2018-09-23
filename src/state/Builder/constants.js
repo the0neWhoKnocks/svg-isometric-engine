@@ -1,6 +1,6 @@
 const NAME = 'Builder';
 const initialState = {
-  project: '',
+  project: undefined,
   projects: [],
 };
 
