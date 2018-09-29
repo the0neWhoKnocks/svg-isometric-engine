@@ -1,6 +1,8 @@
 import { css } from 'glamor';
 import {
+  DARK_THEME__ACCENT_COLOR,
   DARK_THEME__BG_COLOR,
+  DARK_THEME__FONT_COLOR,
 } from 'CONSTANTS/styles';
 
 const styles = {
@@ -22,14 +24,14 @@ const styles = {
     display: 'none',
 
     ':checked + .tab-btn': {
-      color: '#eee',
+      color: DARK_THEME__FONT_COLOR,
       boxShadow: '0px 2px 7px 2px rgba(0,0,0,0.65)',
       background: DARK_THEME__BG_COLOR,
       zIndex: 1,
       transform: 'translateY(0px)',
 
       ' .tab-icon': {
-        fill: '#00fffa',
+        fill: DARK_THEME__ACCENT_COLOR,
       },
     },
   }),

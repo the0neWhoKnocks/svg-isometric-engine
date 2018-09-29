@@ -1,20 +1,27 @@
 import { css } from 'glamor';
 
+const SPACING = '0.25em';
+
 const styles = {
   root: css({
-    paddingTop: '0.25em',
+    paddingTop: SPACING,
     display: 'flex',
     flexDirection: 'column',
     flexGrow: 1,
+    position: 'relative',
+
+    ' .progress__container': {
+      margin: SPACING,
+    },
   }),
 
   nav: css({
-    padding: '0.25em',
-    margin: '0 0.25em',
+    padding: SPACING,
+    margin: `0 ${ SPACING }`,
     background: '#333',
 
     ' .nav-btn': {
-      marginRight: '0.25em',
+      marginRight: SPACING,
 
       ' button': {
         color: '#eee',
@@ -25,8 +32,8 @@ const styles = {
   }),
 
   tiles: css({
-    padding: '0.25em',
-    margin: '0.25em',
+    padding: SPACING,
+    margin: SPACING,
     background: '#333',
     overflowX: 'hidden',
     flexGrow: 1,
