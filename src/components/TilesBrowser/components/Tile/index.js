@@ -1,18 +1,21 @@
 import React from 'react';
 import { string } from 'prop-types';
 
-const Tile = ({ image, name }) => {
+const Tile = ({
+  name,
+  src,
+}) => {
   return (
     <div>
       <div>{ name }</div>
-      <img src={ image } />
+      <img src={ src } />
     </div>
   );
 };
 
 Tile.propTypes = {
-  image: string,
   name: string,
+  src: string,
 };
 
 export default Tile;

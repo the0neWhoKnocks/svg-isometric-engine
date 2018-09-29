@@ -1,15 +1,22 @@
-import { PROJECT_DATA } from 'CONSTANTS/routePaths';
+import {
+  PROJECT_DATA,
+  PROJECT_TILES,
+} from 'CONSTANTS/routePaths';
 import { PROJECT } from 'CONSTANTS/queryParams';
-import { add as saveData } from 'UTILS/storage';
-import setParam from 'UTILS/setParam';
+import {
+  getProject,
+} from 'STATE/Builder/selectors';
 import {
   close as closeDialog,
   setError as setDialogError,
 } from 'STATE/Dialog/actions';
 import store from 'STATE/store';
+import { add as saveData } from 'UTILS/storage';
+import setParam from 'UTILS/setParam';
 import {
   SET_PROJECT,
   SET_PROJECTS,
+  SET_TILES,
 } from './actionTypes';
 
 const createProject = opts => {
@@ -45,9 +52,13 @@ const fetchProject = (uid) => {
 
   return axios.get(PROJECT_DATA, { params })
     .then((resp) => {
-      const { data: { project } } = resp;
+      const { data: { name, tiles, uid } } = resp;
 
-      setProject(project);
+      setTiles(tiles);
+      setProject({
+        name,
+        uid,
+      });
     })
     .catch((err) => {
       console.error(err);
@@ -77,9 +88,36 @@ const setProjects = (projects) => {
   });
 };
 
+const setTiles = (tiles) => {
+  const { dispatch } = store.app;
+
+  dispatch({
+    type: SET_TILES,
+    payload: tiles,
+  });
+};
+
+const updateProjectTiles = (tiles) => {
+  const axios = require('axios');
+  const { getState } = store.app;
+
+  return axios.put(PROJECT_TILES, {
+    tiles,
+    uid: getProject(getState()).uid,
+  })
+    .then((resp) => {
+      setTiles(tiles);
+    })
+    .catch((err) => {
+      console.error(err);
+    });
+};
+
 export {
   createProject,
   fetchProject,
   setProject,
   setProjects,
+  setTiles,
+  updateProjectTiles,
 };

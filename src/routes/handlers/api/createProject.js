@@ -1,11 +1,6 @@
 import {
   mkdirp,
-  outputJson,
 } from 'fs-extra';
-import {
-  PROJECT_FILE,
-  PROJECT_TEMPLATE,
-} from 'CONSTANTS/misc';
 import { paths } from 'ROOT/conf.app';
 import logger, {
   BLACK_ON_GREEN,
@@ -33,14 +28,13 @@ export default routeWrapper.bind(null, (req, res) => {
     }
     else{
       const getProjectsList = require('UTILS/getProjectsList').default;
-      const projFile = { ...PROJECT_TEMPLATE };
+      const writeProjectData = require('UTILS/writeProjectData').default;
+      const projFile = {
+        name: projectName,
+        uid: folderName,
+      };
 
-      projFile.name = projectName;
-      projFile.uid = folderName;
-
-      outputJson(`${ PROJECT_PATH }/${ PROJECT_FILE }`, projFile, {
-        spaces: 2,
-      })
+      writeProjectData(folderName, projFile)
         .then(async () => {
           logger(
             `${ BLACK_ON_GREEN } CREATED`,

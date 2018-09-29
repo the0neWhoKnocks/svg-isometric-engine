@@ -1,54 +1,81 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import { arrayOf, number, shape, string } from 'prop-types';
+import axios from 'axios';
 import SvgIcon from 'COMPONENTS/SvgIcon';
+import {
+  UPLOAD_FILE,
+} from 'CONSTANTS/routePaths';
+import { updateProjectTiles } from 'STATE/Builder/actions';
+import {
+  getProject,
+  getTiles,
+} from 'STATE/Builder/selectors';
 import FilePicker from './components/FilePicker';
 import Tile from './components/Tile';
 import styles from './styles';
+
+const browserProps = (state) => ({
+  project: getProject(state),
+  tiles: getTiles(state),
+});
 
 const FILE_TYPES = 'image/*';
 class TilesBrowser extends Component {
   constructor() {
     super();
 
-    this.state = {
-      tiles: [],
-    };
     this.handleChosenTiles = this.handleChosenTiles.bind(this);
   }
 
-  handleChosenTiles(files) {
-    const tiles = [];
+  uploadFile(file, projectId) {
+    const data = new FormData();
+    data.append('fileName', file.name);
+    data.append('projectId', projectId);
+    data.append('file', file);
 
-    files.forEach((currFile) => {
-      const reader = new FileReader();
-
-      // Closure to capture the file information.
-      reader.onload = ((tile) => {
-        return (fileEv) => {
-          tiles.push({
-            image: fileEv.target.result,
-            name: escape(tile.name),
-          });
-
-          // Once all the tiles have been loaded, update the view
-          if(tiles.length === files.length){
-            this.setState({
-              // TODO filter out duplicates, and maintain order
-              tiles: [
-                ...this.state.tiles,
-                ...tiles,
-              ],
-            });
-          }
-        };
-      })(currFile);
-
-      // Read in the image file as a data URL.
-      reader.readAsDataURL(currFile);
+    return axios.put(UPLOAD_FILE, data, {
+      onUploadProgress: (progressEvent) => {
+        const percentCompleted = Math.round( (progressEvent.loaded * 100) / progressEvent.total );
+        console.log('Upload progress:', percentCompleted);
+      },
     });
   }
 
+  uploadFiles(files) {
+    const _ndx = 0;
+    const projectId = this.props.project.uid;
+
+    const upload = (ndx) => {
+      this.uploadFile(files[ndx], projectId)
+        .then((resp) => {
+          updateProjectTiles(resp.data.files);
+
+          ndx++;
+          if(ndx < files.length){
+            upload(ndx);
+          }
+          else{
+            console.log('done uploading files');
+          }
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    };
+
+    upload(_ndx);
+  }
+
+  handleChosenTiles(files) {
+    this.uploadFiles(files);
+  }
+
   render() {
-    const { tiles } = this.state;
+    const {
+      project,
+      tiles,
+    } = this.props;
 
     return (
       <div className={`tiles-browser ${ styles.root }`}>
@@ -71,11 +98,11 @@ class TilesBrowser extends Component {
           />
         </nav>
         <div className={`tiles-browser__tiles ${ styles.tiles }`}>
-          {tiles.map(({ image, name }, ndx) => {
+          {tiles.map((name, ndx) => {
             return (
               <Tile
                 key={ name }
-                image={ image }
+                src={`/projects/${ project.uid }/tiles/${ name }`}
                 name={ name }
               />
             );
@@ -86,4 +113,11 @@ class TilesBrowser extends Component {
   }
 }
 
-export default TilesBrowser;
+TilesBrowser.propTypes = {
+  project: shape({
+    uid: number,
+  }),
+  tiles: arrayOf(string),
+};
+
+export default connect(browserProps)(TilesBrowser);
