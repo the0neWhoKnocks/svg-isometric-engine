@@ -7,7 +7,10 @@ import SvgIcon from 'COMPONENTS/SvgIcon';
 import {
   UPLOAD_FILE,
 } from 'CONSTANTS/routePaths';
-import { updateProjectTiles } from 'STATE/Builder/actions';
+import {
+  deleteTile,
+  updateProjectTiles,
+} from 'STATE/Builder/actions';
 import {
   getProject,
   getTiles,
@@ -33,9 +36,12 @@ class TilesBrowser extends Component {
     };
     this.state = {
       ...this.defaultProgress,
+      selectedTile: undefined,
     };
 
     this.handleChosenTiles = this.handleChosenTiles.bind(this);
+    this.handleTileSelect = this.handleTileSelect.bind(this);
+    this.handleTileDelete = this.handleTileDelete.bind(this);
   }
 
   uploadFile(file, projectId) {
@@ -95,6 +101,22 @@ class TilesBrowser extends Component {
     this.uploadFiles(files);
   }
 
+  handleTileDelete() {
+    deleteTile(this.state.selectedTile);
+  }
+
+  handleTileSelect(ev) {
+    const tileName = ev.currentTarget.value;
+    let selectedTile = tileName;
+
+    // allows for de-selecting a currently select tile
+    if(selectedTile === this.state.selectedTile) selectedTile = undefined;
+
+    this.setState({
+      selectedTile,
+    });
+  }
+
   render() {
     const {
       project,
@@ -102,6 +124,7 @@ class TilesBrowser extends Component {
     } = this.props;
     const {
       progressMessage,
+      selectedTile,
       showProgress,
       uploadProgress,
     } = this.state;
@@ -115,30 +138,48 @@ class TilesBrowser extends Component {
     return (
       <div className={`tiles-browser ${ styles.root }`}>
         <nav className={`tiles-browser__nav ${ styles.nav }`}>
-          <FilePicker
-            accept={ FILE_TYPES }
-            allowMultiple
-            btnLabel={ <SvgIcon name="library_add" /> }
-            btnTooltip="Load tile(s)"
-            className="nav-btn"
-            onFilesChosen={ this.handleChosenTiles }
-          />
-          <FilePicker
-            accept={ FILE_TYPES }
-            allowDirectory
-            btnLabel={ <SvgIcon name="create_new_folder" /> }
-            btnTooltip="Load folder of tiles"
-            className="nav-btn"
-            onFilesChosen={ this.handleChosenTiles }
-          />
+          <div className={`tiles-browser__nav-items ${ styles.navItems }`}>
+            <FilePicker
+              accept={ FILE_TYPES }
+              allowMultiple
+              btnClass="nav-btn"
+              btnLabel={ <SvgIcon name="library_add" /> }
+              btnTooltip="Load tile(s)"
+              className="nav-item"
+              onFilesChosen={ this.handleChosenTiles }
+            />
+            <FilePicker
+              accept={ FILE_TYPES }
+              allowDirectory
+              btnClass="nav-btn"
+              btnLabel={ <SvgIcon name="create_new_folder" /> }
+              btnTooltip="Load folder of tiles"
+              className="nav-item"
+              onFilesChosen={ this.handleChosenTiles }
+            />
+            <div className="nav-item is--filler" />
+            <button
+              className="nav-item nav-btn"
+              title="Delete tile"
+              disabled={ !selectedTile }
+              onClick={ this.handleTileDelete }
+            >
+              <SvgIcon
+                className="delete-icon"
+                name="delete_forever"
+              />
+            </button>
+          </div>
         </nav>
         <div className={`tiles-browser__tiles ${ styles.tiles }`}>
           {tiles.map((name, ndx) => {
             return (
               <Tile
                 key={ name }
-                src={`/projects/${ project.uid }/tiles/${ name }`}
+                current={ name === selectedTile }
                 name={ name }
+                onSelect={ this.handleTileSelect }
+                src={`/projects/${ project.uid }/tiles/${ name }`}
               />
             );
           })}

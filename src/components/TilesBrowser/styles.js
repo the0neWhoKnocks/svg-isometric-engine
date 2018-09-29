@@ -20,14 +20,41 @@ const styles = {
     margin: `0 ${ SPACING }`,
     background: '#333',
 
-    ' .nav-btn': {
+    ' .nav-item': {
       marginRight: SPACING,
+      display: 'inline-block',
 
-      ' button': {
-        color: '#eee',
-        padding: '0em 0.15em 0.15em 0.15em',
-        background: 'transparent',
+      ':last-of-type': {
+        marginRight: '0',
       },
+    },
+
+    ' .nav-btn': {
+      color: '#eee',
+      fontSize: '16px',
+      padding: '0em 0.15em 0.15em 0.15em',
+      border: '1px solid #808080',
+      borderRadius: '0.15em',
+      background: 'transparent',
+      transition: 'opacity 0.25s',
+
+      '[disabled]': {
+        opacity: 0.25,
+        cursor: 'default',
+      },
+
+      ' .delete-icon': {
+        fill: '#f58264',
+      },
+    },
+  }),
+
+  navItems: css({
+    display: 'flex',
+    flexDirection: 'row',
+
+    ' .is--filler': {
+      flexGrow: 1,
     },
   }),
 

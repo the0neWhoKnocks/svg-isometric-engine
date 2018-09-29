@@ -43,6 +43,7 @@ class FilePicker extends Component {
     const {
       allowDirectory,
       allowMultiple,
+      btnClass,
       btnLabel,
       btnTooltip,
       className,
@@ -63,7 +64,7 @@ class FilePicker extends Component {
       <div className={`${ styles.root } ${ className }`}>
         <button
           type="button"
-          className={`${ styles.chooseBtn }`}
+          className={`${ styles.chooseBtn } ${ btnClass }`}
           onClick={ this.handleClick }
         >{ btnLabel }</button>
         <input
@@ -87,6 +88,7 @@ FilePicker.propTypes = {
   ]),
   allowDirectory: bool,
   allowMultiple: bool,
+  btnClass: string,
   btnLabel: oneOfType([
     node,
     string,
@@ -97,8 +99,10 @@ FilePicker.propTypes = {
 };
 FilePicker.defaultProps = {
   accept: [],
+  btnClass: '',
   btnLabel: 'Choose File',
   btnTooltip: 'Choose File',
+  className: '',
 };
 
 export default FilePicker;
