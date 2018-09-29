@@ -1,4 +1,5 @@
 import {
+  DELETE_TILE,
   PROJECT_DATA,
   PROJECT_TILES,
 } from 'CONSTANTS/routePaths';
@@ -43,6 +44,23 @@ const createProject = opts => {
         status,
         statusText,
       });
+    });
+};
+
+const deleteTile = (tile) => {
+  const axios = require('axios');
+  const { getState } = store.app;
+  const params = {
+    projectId: getProject(getState()).uid,
+    tile,
+  };
+
+  return axios.delete(DELETE_TILE, { params })
+    .then((resp) => {
+      updateProjectTiles(resp.data.tiles);
+    })
+    .catch((err) => {
+      console.error(err);
     });
 };
 
@@ -115,6 +133,7 @@ const updateProjectTiles = (tiles) => {
 
 export {
   createProject,
+  deleteTile,
   fetchProject,
   setProject,
   setProjects,

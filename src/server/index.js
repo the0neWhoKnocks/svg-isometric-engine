@@ -75,19 +75,21 @@ const app = {
 
     // dynamically wire up routes
     Object.keys(routes).forEach(type => {
-      if(['get', 'post', 'put', 'delete'].includes(type)){
+      if(['get', 'post', 'put', 'del'].includes(type)){
         Object.keys(routes[type]).forEach(routeKey => {
           // `routeKey` will be an identifying key, most likely a file name
           // if dynamically populated.
           const endpoint = routes[type][routeKey];
           const defaultMiddleware = [routeLogger];
           const routeArgs = [endpoint.path];
+          // account for `delete` being a reserved word
+          const method = (type === 'del') ? 'delete' : type;
 
           routeArgs.push(...defaultMiddleware);
           if(endpoint.middleware) routeArgs.push(...endpoint.middleware);
           routeArgs.push(endpoint.handler);
 
-          this.expressInst[type](...routeArgs);
+          this.expressInst[method](...routeArgs);
         });
       }
     });

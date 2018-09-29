@@ -4,6 +4,7 @@ import orderRoutes from 'UTILS/orderRoutes';
 // NOTE - Routes can be set up statically here, or dynamically via the mechanism
 // set-up below.
 let routes = {
+  del: {},
   get: {
     FAVICON: {
       exact: true,
@@ -43,6 +44,7 @@ else{
 routes = orderRoutes(routes);
 
 const {
+  del,
   get,
   post,
   put,
@@ -50,6 +52,7 @@ const {
 const CLIENT_ROUTES = Object.keys(get).map((key) => get[key]);
 export {
   CLIENT_ROUTES,
+  del,
   get,
   post,
   put,
