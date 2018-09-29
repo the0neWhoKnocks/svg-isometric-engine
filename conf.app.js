@@ -20,6 +20,7 @@ const conf = {
   },
   APP_TITLE: `Isographic Map Builder v${ packageJSON.version }`,
   clientPaths: {
+    FAVICON: '/media/favicon.png',
     PUBLIC_URL: '',
     MEDIA: '/media',
   },
