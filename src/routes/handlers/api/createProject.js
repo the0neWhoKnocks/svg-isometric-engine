@@ -9,9 +9,8 @@ import logger, {
   BLUE_END,
   BLUE_START,
 } from 'UTILS/logger';
-import routeWrapper from 'UTILS/routeWrapper';
 
-export default routeWrapper.bind(null, (req, res) => {
+export default (req, res) => {
   const { body: { projectName } } = req;
   const folderName = Date.now();
   const PROJECT_PATH = `${ paths.PROJECTS }/${ folderName }`;
@@ -58,4 +57,4 @@ export default routeWrapper.bind(null, (req, res) => {
         });
     }
   });
-});
+};

@@ -1,8 +1,6 @@
 import { execSync } from 'child_process';
 import readline from 'readline';
 import 'colors';
-import { RESET_STATE } from 'CONSTANTS/misc';
-import store from 'STATE/store';
 import log, {
   BLACK_ON_GREEN,
   BLUE,
@@ -17,7 +15,7 @@ const getTermWidth = () => execSync('tput cols').toString();
  * @param {Object} req - The request
  * @param {Object} res - The response
  */
-export default (next, req, res) => {
+export default (req, res, next) => {
   const args = [`${ BLACK_ON_GREEN } ROUTE`, 'matched:', `${ BLUE } ${ req.route.path }`];
   // add on params if token was replaced
   if(
@@ -30,9 +28,6 @@ export default (next, req, res) => {
   readline.cursorTo(process.stdout, 0, null);
   process.stdout.write( '─'.gray.repeat(getTermWidth()) + "\n" ); // eslint-disable-line
 
-  // resets all reducer states
-  store.app.dispatch({ type: RESET_STATE });
-
   log(...args);
-  next(req, res);
+  next();
 };

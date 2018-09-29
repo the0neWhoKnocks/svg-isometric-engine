@@ -13,6 +13,9 @@ const ROUTE = {
 
 if( ON_SERVER ){
   ROUTE.handler = require('ROUTES/handlers/app').default;
+  ROUTE.middleware = [
+    require('ROUTES/middleware/resetState').default,
+  ];
 }
 
 export default {

@@ -66,6 +66,8 @@ const app = {
   },
 
   setupRoutes: function(){
+    const routeLogger = require('ROUTES/middleware/routeLogger').default;
+
     // Has to come before any other routes since it's a dynamic route inserted
     // by reload, and won't resolve if any other routes are set up to handle
     // js files or there are any catch-all's.
@@ -78,8 +80,10 @@ const app = {
           // `routeKey` will be an identifying key, most likely a file name
           // if dynamically populated.
           const endpoint = routes[type][routeKey];
+          const defaultMiddleware = [routeLogger];
           const routeArgs = [endpoint.path];
 
+          routeArgs.push(...defaultMiddleware);
           if(endpoint.middleware) routeArgs.push(...endpoint.middleware);
           routeArgs.push(endpoint.handler);
 

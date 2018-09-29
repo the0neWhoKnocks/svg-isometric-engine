@@ -2,7 +2,6 @@ import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import glob from 'glob';
 import { paths } from 'SRC/../conf.app';
-import routeWrapper from 'UTILS/routeWrapper';
 
 let svgSprites = '';
 glob.sync('**/*.svg', {
@@ -23,7 +22,7 @@ svgSprites = `
 </svg>
 `;
 
-export default routeWrapper.bind(null, (req, res) => {
+export default (req, res) => {
   const {
     stat,
     statSync,
@@ -153,4 +152,4 @@ export default routeWrapper.bind(null, (req, res) => {
       }
     });
   });
-});
+};
