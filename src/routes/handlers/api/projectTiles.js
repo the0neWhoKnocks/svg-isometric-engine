@@ -1,9 +1,8 @@
 import logger, {
   BLACK_ON_RED,
 } from 'UTILS/logger';
-import routeWrapper from 'UTILS/routeWrapper';
 
-export default routeWrapper.bind(null, async (req, res) => {
+export default async (req, res) => {
   const readProjectData = require('UTILS/readProjectData').default;
   const writeProjectData = require('UTILS/writeProjectData').default;
 
@@ -39,4 +38,4 @@ export default routeWrapper.bind(null, async (req, res) => {
         res.send(err.message);
       });
   }
-});
+};

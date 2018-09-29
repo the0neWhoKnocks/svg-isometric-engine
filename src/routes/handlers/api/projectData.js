@@ -2,9 +2,8 @@ import logger, {
   BLACK_ON_RED,
 } from 'UTILS/logger';
 import readProjectData from 'UTILS/readProjectData';
-import routeWrapper from 'UTILS/routeWrapper';
 
-export default routeWrapper.bind(null, (req, res) => {
+export default (req, res) => {
   const { uid: projectFolder } = req.query;
 
   if( !projectFolder ){
@@ -35,4 +34,4 @@ export default routeWrapper.bind(null, (req, res) => {
         res.send(err.message);
       });
   }
-});
+};
