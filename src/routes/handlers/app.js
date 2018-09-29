@@ -25,7 +25,6 @@ svgSprites = `
 
 export default routeWrapper.bind(null, (req, res) => {
   const {
-    readJsonSync,
     stat,
     statSync,
   } = require('fs-extra');
@@ -36,7 +35,6 @@ export default routeWrapper.bind(null, (req, res) => {
   const { renderStatic } = require('glamor/server');
   const serialize = require('serialize-javascript');
   const ClientShell = require('COMPONENTS/Shell').default;
-  const { PROJECT_FILE } = require('CONSTANTS/misc');
   const { PROJECT } = require('CONSTANTS/queryParams');
   const appConfig = require('ROOT/conf.app');
   const { CLIENT_ROUTES } = require('ROUTES');
@@ -48,6 +46,7 @@ export default routeWrapper.bind(null, (req, res) => {
   const {
     setProject,
     setProjects,
+    setTiles,
   } = require('STATE/Builder/actions');
   const { default: store } = require('STATE/store');
   const {
@@ -59,6 +58,7 @@ export default routeWrapper.bind(null, (req, res) => {
   } = require('UTILS/logger');
   const awaitSSRData = require('UTILS/awaitSSRData').default;
   const getProjectsList = require('UTILS/getProjectsList').default;
+  const readProjectData = require('UTILS/readProjectData').default;
 
   const { dispatch, getState } = store.app;
   const { query } = req;
@@ -86,7 +86,7 @@ export default routeWrapper.bind(null, (req, res) => {
       req.url,
       req.params,
       CLIENT_ROUTES,
-    ).then(() => {
+    ).then(async () => {
       dispatch( setShellClass({ pathname: req.path }) );
       if(projects) setProjects(projects);
       // Account for users entering random queries by ensuring project folder exists
@@ -98,8 +98,12 @@ export default routeWrapper.bind(null, (req, res) => {
           projectParam
           && statSync(PROJECT_PATH).isDirectory()
         ){
-          const projectData = readJsonSync(`${ PROJECT_PATH }/${ PROJECT_FILE }`);
-          setProject(projectData);
+          const { name, tiles, uid } = await readProjectData(projectParam);
+          setProject({
+            name,
+            uid,
+          });
+          setTiles(tiles);
         }
       }catch(err){ /* I don't care about stat errors */ }
 

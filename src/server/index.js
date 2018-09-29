@@ -78,7 +78,12 @@ const app = {
           // `routeKey` will be an identifying key, most likely a file name
           // if dynamically populated.
           const endpoint = routes[type][routeKey];
-          this.expressInst[type](endpoint.path, endpoint.handler);
+          const routeArgs = [endpoint.path];
+
+          if(endpoint.middleware) routeArgs.push(...endpoint.middleware);
+          routeArgs.push(endpoint.handler);
+
+          this.expressInst[type](...routeArgs);
         });
       }
     });

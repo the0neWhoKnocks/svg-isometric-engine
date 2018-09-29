@@ -1,11 +1,16 @@
 import logger, {
   BLACK_ON_RED,
 } from 'UTILS/logger';
-import readProjectData from 'UTILS/readProjectData';
 import routeWrapper from 'UTILS/routeWrapper';
 
-export default routeWrapper.bind(null, (req, res) => {
-  const { uid: projectFolder } = req.query;
+export default routeWrapper.bind(null, async (req, res) => {
+  const readProjectData = require('UTILS/readProjectData').default;
+  const writeProjectData = require('UTILS/writeProjectData').default;
+
+  const {
+    tiles,
+    uid: projectFolder,
+  } = req.body;
 
   if( !projectFolder ){
     const errMsg = 'No `uid` was provided';
@@ -17,18 +22,17 @@ export default routeWrapper.bind(null, (req, res) => {
     res.send(errMsg);
   }
   else{
-    readProjectData(projectFolder)
-      .then(({ name, tiles, uid }) => {
-        res.send({
-          name,
-          tiles,
-          uid,
-        });
+    const data = await readProjectData(projectFolder);
+    data.tiles = tiles;
+
+    writeProjectData(projectFolder, data)
+      .then((project) => {
+        res.sendStatus(200);
       })
       .catch((err) => {
         logger(
           `${ BLACK_ON_RED } ERROR`,
-          "Couldn't read project data because:",
+          "Couldn't update `tiles` data",
           err.message,
         );
         res.status(500);

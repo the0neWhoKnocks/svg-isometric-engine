@@ -6,6 +6,7 @@ import { initialState } from './constants';
 import {
   SET_PROJECT,
   SET_PROJECTS,
+  SET_TILES,
 } from './actionTypes';
 
 export default (state = initialState, action = {}) => {
@@ -29,6 +30,14 @@ export default (state = initialState, action = {}) => {
       return {
         ...state,
         projects: payload,
+      };
+    }
+
+    case SET_TILES: {
+      reducerLogger(type, ['tiles']);
+      return {
+        ...state,
+        tiles: [...payload],
       };
     }
 
