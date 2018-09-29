@@ -68,6 +68,7 @@ export default (req, res) => {
   if( /.*\.(js|css|json|jpg|png|gif)$/.test(req.url) ){
     res.status(404);
     res.send('File not found in catch-all route');
+    return;
   }
 
   // ensures the favicon is always current (with every start of the server)

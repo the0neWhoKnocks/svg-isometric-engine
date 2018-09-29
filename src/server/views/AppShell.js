@@ -37,7 +37,7 @@ module.exports = function(model){
         <meta name="theme-color" content="#000000">
 
         <link rel="manifest" href="/manifest.json">
-        <link rel="shortcut icon" href="/media/favicon.png?v=${ model.faviconModTime }">
+        <link rel="shortcut icon" href="${ appConfig.clientPaths.FAVICON }?v=${ model.faviconModTime }">
 
         <style>${ model.css }</style>
 

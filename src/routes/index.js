@@ -9,7 +9,12 @@ let routes = {
     FAVICON: {
       exact: true,
       path: '/favicon.ico',
-      handler: (req, res) => res.sendStatus(204),
+      handler: (req, res) => {
+        if(ON_SERVER){
+          const { clientPaths } = require('ROOT/conf.app');
+          res.redirect(clientPaths.FAVICON);
+        }
+      },
     },
   },
   post: {},
