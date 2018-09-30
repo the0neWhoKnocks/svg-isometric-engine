@@ -44,13 +44,12 @@ class TilesBrowser extends Component {
       ...this.defaultProgress,
       beingDeleted: undefined,
       selectedTile: undefined,
-      selectedTileWidth: undefined,
-      selectedTileHeight: undefined,
     };
 
     this.handleChosenTiles = this.handleChosenTiles.bind(this);
     this.handleTileSelect = this.handleTileSelect.bind(this);
     this.handleTileDelete = this.handleTileDelete.bind(this);
+    this.handleTileDeletion = this.handleTileDeletion.bind(this);
   }
 
   uploadFile(file, projectId) {
@@ -119,26 +118,22 @@ class TilesBrowser extends Component {
     });
   }
 
+  handleTileDeletion() {
+    this.setState({
+      beingDeleted: undefined,
+    });
+  }
+
   handleTileSelect(ev) {
     const el = ev.currentTarget;
     const tileName = el.value;
-    // setting width and height so an item deletion can be animated and shift
-    // it's siblings in the process.
-    let selectedTileWidth = el.parentNode.offsetWidth;
-    let selectedTileHeight = el.parentNode.offsetHeight;
     let selectedTile = tileName;
 
     // allows for de-selecting a currently select tile
-    if(selectedTile === this.state.selectedTile) {
-      selectedTile = undefined;
-      selectedTileWidth = undefined;
-      selectedTileHeight = undefined;
-    }
+    if(selectedTile === this.state.selectedTile) selectedTile = undefined;
 
     this.setState({
       selectedTile,
-      selectedTileWidth,
-      selectedTileHeight,
     });
   }
 
@@ -151,8 +146,6 @@ class TilesBrowser extends Component {
       beingDeleted,
       progressMessage,
       selectedTile,
-      selectedTileWidth,
-      selectedTileHeight,
       showProgress,
       uploadProgress,
     } = this.state;
@@ -201,38 +194,26 @@ class TilesBrowser extends Component {
         </nav>
         <TransitionGroup
           className={`tiles-browser__tiles ${ styles.tiles }`}
-          appear={ false }
-          enter={ false }
         >
-          {tiles.map((name, ndx) => {
-            const tileProps = {
-              current: name === selectedTile || name === beingDeleted,
-              name,
-              onSelect: this.handleTileSelect,
-              src: `/projects/${ project.uid }/tiles/${ name }`,
-            };
-
-            if( name === beingDeleted ){
-              tileProps.style = {
-                width: `${ selectedTileWidth }px`,
-                height: `${ selectedTileHeight }px`,
-              };
-            }
-
-            return (
-              <CSSTransition
-                key={ name }
-                timeout={ DELETE_DURATION }
-                classNames={{
-                  exit: 'delete--started',
-                  exitActive: 'is--deleting',
-                  exitDone: 'has--deleted',
-                }}
-              >
-                <Tile { ...tileProps } />
-              </CSSTransition>
-            );
-          })}
+          {tiles.map((name, ndx) => (
+            <CSSTransition
+              key={ name }
+              timeout={ DELETE_DURATION }
+              classNames={{
+                exit: 'delete--started',
+                exitActive: 'is--deleting',
+                exitDone: 'has--deleted',
+              }}
+              onExited={ this.handleTileDeletion }
+            >
+              <Tile
+                current={ name === selectedTile || name === beingDeleted }
+                name={ name }
+                onSelect={ this.handleTileSelect }
+                src={ `/projects/${ project.uid }/tiles/${ name }` }
+              />
+            </CSSTransition>
+          ))}
         </TransitionGroup>
         <ProgressIndicator { ...progressProps } />
       </div>
