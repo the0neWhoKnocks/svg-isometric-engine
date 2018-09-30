@@ -1,5 +1,9 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import {
+  CSSTransition,
+  TransitionGroup,
+} from 'react-transition-group';
 import { arrayOf, number, shape, string } from 'prop-types';
 import axios from 'axios';
 import ProgressIndicator from 'COMPONENTS/ProgressIndicator';
@@ -17,7 +21,9 @@ import {
 } from 'STATE/Builder/selectors';
 import FilePicker from './components/FilePicker';
 import Tile from './components/Tile';
-import styles from './styles';
+import styles, {
+  DELETE_DURATION,
+} from './styles';
 
 const browserProps = (state) => ({
   project: getProject(state),
@@ -36,7 +42,10 @@ class TilesBrowser extends Component {
     };
     this.state = {
       ...this.defaultProgress,
+      beingDeleted: undefined,
       selectedTile: undefined,
+      selectedTileWidth: undefined,
+      selectedTileHeight: undefined,
     };
 
     this.handleChosenTiles = this.handleChosenTiles.bind(this);
@@ -102,18 +111,34 @@ class TilesBrowser extends Component {
   }
 
   handleTileDelete() {
-    deleteTile(this.state.selectedTile);
+    this.setState({
+      beingDeleted: this.state.selectedTile,
+      selectedTile: undefined,
+    }, () => {
+      deleteTile(this.state.beingDeleted);
+    });
   }
 
   handleTileSelect(ev) {
-    const tileName = ev.currentTarget.value;
+    const el = ev.currentTarget;
+    const tileName = el.value;
+    // setting width and height so an item deletion can be animated and shift
+    // it's siblings in the process.
+    let selectedTileWidth = el.parentNode.offsetWidth;
+    let selectedTileHeight = el.parentNode.offsetHeight;
     let selectedTile = tileName;
 
     // allows for de-selecting a currently select tile
-    if(selectedTile === this.state.selectedTile) selectedTile = undefined;
+    if(selectedTile === this.state.selectedTile) {
+      selectedTile = undefined;
+      selectedTileWidth = undefined;
+      selectedTileHeight = undefined;
+    }
 
     this.setState({
       selectedTile,
+      selectedTileWidth,
+      selectedTileHeight,
     });
   }
 
@@ -123,8 +148,11 @@ class TilesBrowser extends Component {
       tiles,
     } = this.props;
     const {
+      beingDeleted,
       progressMessage,
       selectedTile,
+      selectedTileWidth,
+      selectedTileHeight,
       showProgress,
       uploadProgress,
     } = this.state;
@@ -171,19 +199,41 @@ class TilesBrowser extends Component {
             </button>
           </div>
         </nav>
-        <div className={`tiles-browser__tiles ${ styles.tiles }`}>
+        <TransitionGroup
+          className={`tiles-browser__tiles ${ styles.tiles }`}
+          appear={ false }
+          enter={ false }
+        >
           {tiles.map((name, ndx) => {
+            const tileProps = {
+              current: name === selectedTile || name === beingDeleted,
+              name,
+              onSelect: this.handleTileSelect,
+              src: `/projects/${ project.uid }/tiles/${ name }`,
+            };
+
+            if( name === beingDeleted ){
+              tileProps.style = {
+                width: `${ selectedTileWidth }px`,
+                height: `${ selectedTileHeight }px`,
+              };
+            }
+
             return (
-              <Tile
+              <CSSTransition
                 key={ name }
-                current={ name === selectedTile }
-                name={ name }
-                onSelect={ this.handleTileSelect }
-                src={`/projects/${ project.uid }/tiles/${ name }`}
-              />
+                timeout={ DELETE_DURATION }
+                classNames={{
+                  exit: 'delete--started',
+                  exitActive: 'is--deleting',
+                  exitDone: 'has--deleted',
+                }}
+              >
+                <Tile { ...tileProps } />
+              </CSSTransition>
             );
           })}
-        </div>
+        </TransitionGroup>
         <ProgressIndicator { ...progressProps } />
       </div>
     );
