@@ -1,6 +1,7 @@
 import { css } from 'glamor';
 
 const SPACING = '0.25em';
+export const DELETE_DURATION = 500;
 
 const styles = {
   root: css({
@@ -64,6 +65,21 @@ const styles = {
     background: '#333',
     overflowX: 'hidden',
     flexGrow: 1,
+
+    ' .tile-container': {
+      display: 'inline-block',
+      verticalAlign: 'middle',
+
+      '.delete--started': {
+        transition: `all ${ DELETE_DURATION }ms`,
+        overflow: 'hidden',
+      },
+
+      '.is--deleting': {
+        width: '0px !important',
+        height: '0px !important',
+      },
+    },
   }),
 };
 
