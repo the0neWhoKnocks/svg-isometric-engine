@@ -1,7 +1,7 @@
 import { css } from 'glamor';
 
 const SPACING = '0.25em';
-export const DELETE_DURATION = 500;
+export const DELETE_DURATION = 250;
 
 const styles = {
   root: css({
@@ -65,19 +65,20 @@ const styles = {
     background: '#333',
     overflowX: 'hidden',
     flexGrow: 1,
+    display: 'grid',
+    // TODO - 140 is an arbitrary number, right now it's just wider than the
+    // the largest tile image. May have to grab the largest width of the
+    // loaded tiles, and use that.
+    gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+    gridGap: '1px',
 
     ' .tile-container': {
-      display: 'inline-block',
-      verticalAlign: 'middle',
-
       '.delete--started': {
-        transition: `all ${ DELETE_DURATION }ms`,
-        overflow: 'hidden',
+        transition: `transform ${ DELETE_DURATION }ms`,
       },
 
       '.is--deleting': {
-        width: '0px !important',
-        height: '0px !important',
+        transform: 'scale(0) rotate(360deg)',
       },
     },
   }),
