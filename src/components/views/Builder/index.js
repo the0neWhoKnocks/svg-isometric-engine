@@ -18,6 +18,7 @@ import {
   getProjects,
 } from 'STATE/Builder/selectors';
 import { get as getData } from 'UTILS/storage';
+import MapRenderer from './components/MapRenderer';
 import ProjectSelector from './components/ProjectSelector';
 import TopNav from './components/TopNav';
 import styles, { globals as globalStyles } from './styles';
@@ -32,10 +33,13 @@ class Builder extends Component {
     super();
 
     this.state = {
+      mapHeight: props.mapHeight,
+      mapWidth: props.mapWidth,
       mounted: false,
     };
 
     globalStyles();
+    this.handleMapSizeChange = this.handleMapSizeChange.bind(this);
   }
 
   componentDidMount() {
@@ -65,12 +69,23 @@ class Builder extends Component {
     });
   }
 
+  handleMapSizeChange(ev) {
+    const el = ev.currentTarget;
+    const state = (el.name === 'mapWidth')
+      ? { mapWidth: +el.value }
+      : { mapHeight: +el.value };
+
+    this.setState(state);
+  }
+
   render() {
     const {
       project,
       projects,
     } = this.props;
     const {
+      mapHeight,
+      mapWidth,
       mounted,
     } = this.state;
 
@@ -85,8 +100,40 @@ class Builder extends Component {
             <SplitPane split="vertical">
               <Pane initialSize="75%">
                 <SplitPane split="horizontal">
-                  <Pane>Builder</Pane>
-                  <Pane>Preview</Pane>
+                  <Pane className={`map-pane ${ styles.mapPane }`}>
+                    <div className={`map-pane__label ${ styles.mapPaneLabel }`}>
+                      Builder
+                    </div>
+                    <MapRenderer
+                      mapWidth={mapWidth}
+                      mapHeight={mapHeight}
+                    />
+                    <nav className={`${ styles.builderNav }`}>
+                      <label>
+                        Map Width:
+                        <input
+                          type="number"
+                          value={mapWidth}
+                          name="mapWidth"
+                          onChange={this.handleMapSizeChange}
+                        />
+                      </label>
+                      <label>
+                        Map Height:
+                        <input
+                          type="number"
+                          value={mapHeight}
+                          name="mapHeight"
+                          onChange={this.handleMapSizeChange}
+                        />
+                      </label>
+                    </nav>
+                  </Pane>
+                  <Pane className={`map-pane ${ styles.mapPane }`}>
+                    <div className={`map-pane__label ${ styles.mapPaneLabel }`}>
+                      Preview
+                    </div>
+                  </Pane>
                 </SplitPane>
               </Pane>
               <Pane>
@@ -122,14 +169,23 @@ class Builder extends Component {
   }
 }
 
+Builder.defaultProps = {
+  mapHeight: 4,
+  mapWidth: 4,
+};
+
 Builder.propTypes = {
   dialogError: shape({
     data: string,
     status: number,
     statusText: string,
   }),
+  mapHeight: number,
+  mapWidth: number,
   project: PROJECT,
   projects: PROJECTS,
+  tileHeight: number,
+  tileWidth: number,
 };
 
 export default connect(builderProps)(Builder);

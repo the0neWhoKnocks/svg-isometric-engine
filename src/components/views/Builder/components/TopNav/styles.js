@@ -13,6 +13,7 @@ const styles = {
   root: css({
     background: '#333',
     position: 'relative',
+    zIndex: 10,
 
     ' .flyout': {
       ' label:hover': {
