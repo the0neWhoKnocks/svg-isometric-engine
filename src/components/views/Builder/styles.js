@@ -86,17 +86,45 @@ const styles = {
       },
     },
   }),
-  
+
   rail: css({
     height: '100%',
     display: 'flex',
     flexDirection: 'column',
   }),
-  
+
   tabs: css({
     ' .tabs__tab': {
       display: 'flex',
       flexDirection: 'column',
+    },
+  }),
+
+  mapPane: css({
+    position: 'relative',
+  }),
+
+  mapPaneLabel: css({
+    color: '#fff',
+    borderRadius: '0.25em',
+    background: '#000',
+    position: 'absolute',
+    top: '4px',
+    left: '4px',
+    opacity: '0.25',
+    padding: '0 0.5em',
+    pointerEvents: 'none',
+  }),
+
+  builderNav: css({
+    textAlign: 'right',
+    position: 'absolute',
+    top: '4px',
+    left: 0,
+    right: '4px',
+
+    ' input': {
+      width: '3em',
     },
   }),
 };
