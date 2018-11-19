@@ -128,6 +128,39 @@ const styles = {
       textAlign: 'center',
     },
   }),
+
+  overlay: css({
+    background: '#00000073',
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    pointerEvents: 'none',
+    transition: 'opacity 0.25s',
+    opacity: 0,
+    zIndex: 100,
+
+    '.is--visible': {
+      opacity: 1,
+      pointerEvents: 'all',
+    },
+
+    ' .overlay__msg': {
+      fontWeight: 'bold',
+      padding: '0.25em 1em 0.3em',
+      borderRadius: '0.5em',
+      background: '#fff',
+      position: 'absolute',
+      top: '50%',
+      left: '50%',
+      transform: 'translate(-50%, -50%)',
+    },
+
+    '.is--error .overlay__msg': {
+      background: '#ff8c78',
+    },
+  }),
 };
 
 export default styles;

@@ -70,16 +70,38 @@ const fetchProject = (uid) => {
 
   return axios.get(PROJECT_DATA, { params })
     .then((resp) => {
-      const { data: { name, tiles, uid } } = resp;
+      const { data: { map, name, tiles, uid } } = resp;
 
       setTiles(tiles);
       setProject({
+        map,
         name,
         uid,
       });
     })
     .catch((err) => {
       console.error(err);
+    });
+};
+
+const saveProject = (data) => {
+  const axios = require('axios');
+  const { getState } = store.app;
+
+  return axios.put(PROJECT_DATA, {
+    data,
+    uid: getProject(getState()).uid,
+  })
+    .then((resp) => {
+      const { data: { map, name, uid } } = resp;
+      setProject({
+        map,
+        name,
+        uid,
+      });
+    })
+    .catch((err) => {
+      throw Error(`Couldn't save project: ${ err.response.statusText }`);
     });
 };
 
@@ -135,6 +157,7 @@ export {
   createProject,
   deleteTile,
   fetchProject,
+  saveProject,
   setProject,
   setProjects,
   setTiles,

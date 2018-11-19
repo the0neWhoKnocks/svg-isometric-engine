@@ -13,6 +13,7 @@ import {
 } from 'CONSTANTS/propTypes';
 import {
   fetchProject,
+  saveProject,
 } from 'STATE/Builder/actions';
 import {
   getProject,
@@ -40,20 +41,33 @@ class Builder extends Component {
     this.state = {
       builderCanvasHeight: 0,
       builderCanvasWidth: 0,
+      error: undefined,
       horzPaneSize: '50%',
-      mapHeight: props.mapHeight,
-      mapWidth: props.mapWidth,
+      mapHeight: (props.project)
+        ? props.project.map.height
+        : props.mapHeight,
+      mapWidth: (props.project)
+        ? props.project.map.width
+        : props.mapWidth,
       mounted: false,
-      tileWidth: props.tileWidth,
-      tileWidthVal: props.tileWidth,
+      saving: false,
+      tileWidth: (props.project)
+        ? props.project.map.tileWidth
+        : props.tileWidth,
+      tileWidthVal: (props.project)
+        ? props.project.map.tileWidth
+        : props.tileWidth,
       vertPaneSize: '75%',
     };
 
     globalStyles();
-    this.handleResize = this.handleResize.bind(this);
     this.handleHorizontalResize = this.handleHorizontalResize.bind(this);
+    this.handleKeyBindings = this.handleKeyBindings.bind(this);
     this.handleMapSizeChange = this.handleMapSizeChange.bind(this);
+    this.handleProjectSave = this.handleProjectSave.bind(this);
+    this.handleResize = this.handleResize.bind(this);
     this.handleTileWidthChange = this.handleTileWidthChange.bind(this);
+    this.handleUnload = this.handleUnload.bind(this);
     this.handleVerticalResize = this.handleVerticalResize.bind(this);
   }
 
@@ -90,6 +104,8 @@ class Builder extends Component {
     });
     this.mounted = true;
 
+    window.addEventListener('keydown', this.handleKeyBindings);
+    window.addEventListener('beforeunload', this.handleUnload);
     window.addEventListener('resize', this.handleResize);
   }
 
@@ -107,6 +123,8 @@ class Builder extends Component {
 
   componentWillUnmount() {
     this.mounted = false;
+    window.removeEventListener('keydown', this.handleKeyBindings);
+    window.removeEventListener('beforeunload', this.handleUnload);
     window.removeEventListener('resize', this.handleResize);
   }
 
@@ -185,6 +203,71 @@ class Builder extends Component {
     });
   }
 
+  handleKeyBindings(ev) {
+    switch(ev.which){
+      case 83: // s
+        if( ev.ctrlKey ){
+          ev.preventDefault();
+          this.handleProjectSave();
+        }
+        break;
+    }
+  }
+
+  handleProjectSave() {
+    this.setState({
+      error: undefined,
+      saving: true,
+    }, () => {
+      saveProject({
+        map: {
+          height: this.state.mapHeight,
+          tileWidth: this.state.tileWidth,
+          width: this.state.mapWidth,
+        },
+      })
+        .then(() => {
+          this.setState({
+            saving: false,
+          });
+        })
+        .catch((err) => {
+          this.setState({
+            error: {
+              msg: err.message,
+              type: 'save',
+            },
+            saving: false,
+          });
+        });
+    });
+  }
+
+  handleUnload(ev) {
+    let customMsg;
+
+    if(this.props.project){
+      // TODO - think of a better way to handle this
+      const mapObj = {
+        height: this.state.mapHeight,
+        tileWidth: this.state.tileWidth,
+        width: this.state.mapWidth,
+      };
+      const props = Object.keys(this.props.project.map);
+
+      for(let i=0; i<props.length; i++){
+        const prop = props[i];
+        if(this.props.project.map[prop] !== mapObj[prop]){
+          customMsg = 'You have unsaved changes';
+          ev.returnValue = customMsg;
+          break;
+        }
+      }
+    }
+
+    return customMsg;
+  }
+
   render() {
     const {
       project,
@@ -193,14 +276,31 @@ class Builder extends Component {
     const {
       builderCanvasWidth,
       builderCanvasHeight,
+      error,
       horzPaneSize,
       mapHeight,
       mapWidth,
       mounted,
+      saving,
       tileWidth,
       tileWidthVal,
       vertPaneSize,
     } = this.state;
+    let overlayMsg;
+    let overlayClass = '';
+
+    if(saving) overlayMsg = 'Saving';
+    else if(error) {
+      overlayMsg = (
+        <Fragment>
+          {error.msg}&nbsp;
+          <button onClick={this.handleProjectSave}>Try Again</button>
+        </Fragment>
+      );
+      overlayClass += ' is--error';
+    }
+
+    if(overlayMsg) overlayClass += ' is--visible';
 
     return (
       <div className={`${ styles.root }`}>
@@ -209,7 +309,9 @@ class Builder extends Component {
         )}
         {(mounted && project) && (
           <Fragment>
-            <TopNav />
+            <TopNav
+              onSave={this.handleProjectSave}
+            />
             <SplitPane
               split="vertical"
               onChange={this.handleVerticalResize}
@@ -236,16 +338,14 @@ class Builder extends Component {
                     />
                     <nav className={`builder-nav ${ styles.builderNav }`}>
                       <label>
-                        Map Width:
+                        Map:&nbsp;
                         <input
                           type="number"
                           value={mapWidth}
                           name="mapWidth"
                           onChange={this.handleMapSizeChange}
                         />
-                      </label>
-                      <label>
-                        Map Height:
+                        &nbsp;x&nbsp;
                         <input
                           type="number"
                           value={mapHeight}
@@ -299,6 +399,9 @@ class Builder extends Component {
                 </div>
               </Pane>
             </SplitPane>
+            <div className={`overlay ${ styles.overlay }${ overlayClass }`}>
+              <div className="overlay__msg">{overlayMsg}</div>
+            </div>
           </Fragment>
         )}
       </div>
