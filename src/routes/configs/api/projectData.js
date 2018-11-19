@@ -11,4 +11,5 @@ if( ON_SERVER ){
 
 export default {
   get: [ ROUTE ],
+  put: [ ROUTE ],
 };

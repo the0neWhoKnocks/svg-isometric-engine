@@ -47,9 +47,9 @@
       - [x] If `proj` is set, update `project` state.
   - On Client:
     - [x] Tile Width - Width of sprites being used.
-      - [ ] Save in project settings
+      - [x] Save in project settings
     - [x] Map Size - [ ] x [ ] inputs to allow for 10x10, etc.
-      - [ ] Save in project settings
+      - [x] Save in project settings
       - [ ] `+ Extend` buttons on T,B,L,R which will push empty tiles to current
         tile Arrays.
       - [ ] `Shift ` tiles button to move all tiles up, down, left, or right - to

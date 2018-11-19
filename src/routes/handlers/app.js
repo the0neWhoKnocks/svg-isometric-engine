@@ -98,8 +98,9 @@ export default (req, res) => {
           projectParam
           && statSync(PROJECT_PATH).isDirectory()
         ){
-          const { name, tiles, uid } = await readProjectData(projectParam);
+          const { map, name, tiles, uid } = await readProjectData(projectParam);
           setProject({
+            map,
             name,
             uid,
           });

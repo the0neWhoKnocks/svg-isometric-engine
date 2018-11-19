@@ -30,6 +30,7 @@ class TopNav extends Component {
   constructor(props) {
     super();
 
+    this.handleProjectSave = this.handleProjectSave.bind(this);
     this.handleProjectSelect = this.handleProjectSelect.bind(this);
   }
 
@@ -43,6 +44,13 @@ class TopNav extends Component {
     window.flyout.closeAll();
   }
 
+  handleProjectSave(ev) {
+    const { onSave } = this.props;
+
+    if(onSave) onSave();
+    window.flyout.closeAll();
+  }
+
   render() {
     const {
       project,
@@ -53,7 +61,7 @@ class TopNav extends Component {
       <nav className={`${ styles.root }`}>
         <Flyout
           id="topNavFileBtn"
-          label="Projects"
+          label="Project"
         >
           <Flyout
             btnClass="has--icon"
@@ -76,11 +84,13 @@ class TopNav extends Component {
               >{`projects/ ${ project.name }`}</button>
             ))}
           </Flyout>
-          <button>Rename</button>
-          <button>Save</button>
-          <button>Save As</button>
-          <button>Import</button>
-          <button>Export</button>
+          <button disabled>Rename</button>
+          <button
+            onClick={this.handleProjectSave}
+          >Save</button>
+          <button disabled>Save As</button>
+          <button disabled>Import</button>
+          <button disabled>Export</button>
         </Flyout>
         <div className={`${ styles.projectTitle }`}>{ project.name }</div>
       </nav>
@@ -90,6 +100,7 @@ class TopNav extends Component {
 
 TopNav.propTypes = {
   fetchProject: func,
+  onSave: func,
   project: PROJECT,
   projects: PROJECTS,
 };
