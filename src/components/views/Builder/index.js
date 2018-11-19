@@ -29,6 +29,9 @@ const builderProps = (state) => ({
   projects: getProjects(state),
 });
 
+const TILE_WIDTH_MIN = 5;
+const TILE_WIDTH_MAX = 300;
+
 class Builder extends Component {
   constructor(props) {
     super();
@@ -41,6 +44,8 @@ class Builder extends Component {
       mapHeight: props.mapHeight,
       mapWidth: props.mapWidth,
       mounted: false,
+      tileWidth: props.tileWidth,
+      tileWidthVal: props.tileWidth,
       vertPaneSize: '75%',
     };
 
@@ -48,6 +53,7 @@ class Builder extends Component {
     this.handleResize = this.handleResize.bind(this);
     this.handleHorizontalResize = this.handleHorizontalResize.bind(this);
     this.handleMapSizeChange = this.handleMapSizeChange.bind(this);
+    this.handleTileWidthChange = this.handleTileWidthChange.bind(this);
     this.handleVerticalResize = this.handleVerticalResize.bind(this);
   }
 
@@ -145,6 +151,23 @@ class Builder extends Component {
     }
   }
 
+  handleTileWidthChange(ev) {
+    const val = +ev.currentTarget.value;
+    const state = { tileWidthVal: val };
+
+    this.setState(state, () => {
+      if( this.inputTimeout ) clearTimeout(this.inputTimeout);
+
+      this.inputTimeout = setTimeout(() => {
+        if( val < TILE_WIDTH_MIN ) state.tileWidthVal = TILE_WIDTH_MIN;
+        else if( val > TILE_WIDTH_MAX ) state.tileWidthVal = TILE_WIDTH_MAX;
+        state.tileWidth = state.tileWidthVal;
+
+        this.setState(state);
+      }, 300);
+    });
+  }
+
   render() {
     const {
       project,
@@ -157,6 +180,8 @@ class Builder extends Component {
       mapHeight,
       mapWidth,
       mounted,
+      tileWidth,
+      tileWidthVal,
       vertPaneSize,
     } = this.state;
 
@@ -190,6 +215,7 @@ class Builder extends Component {
                       canvasHeight={builderCanvasHeight}
                       mapWidth={mapWidth}
                       mapHeight={mapHeight}
+                      tileWidth={tileWidth}
                     />
                     <nav className={`builder-nav ${ styles.builderNav }`}>
                       <label>
@@ -208,6 +234,17 @@ class Builder extends Component {
                           value={mapHeight}
                           name="mapHeight"
                           onChange={this.handleMapSizeChange}
+                        />
+                      </label>
+                      <label>
+                        Tile Width:
+                        <input
+                          type="number"
+                          value={tileWidthVal}
+                          name="tileWidth"
+                          onChange={this.handleTileWidthChange}
+                          min={TILE_WIDTH_MIN}
+                          max={TILE_WIDTH_MAX}
                         />
                       </label>
                     </nav>
@@ -255,6 +292,7 @@ class Builder extends Component {
 Builder.defaultProps = {
   mapHeight: 4,
   mapWidth: 4,
+  tileWidth: 128,
 };
 
 Builder.propTypes = {
@@ -267,7 +305,6 @@ Builder.propTypes = {
   mapWidth: number,
   project: PROJECT,
   projects: PROJECTS,
-  tileHeight: number,
   tileWidth: number,
 };
 

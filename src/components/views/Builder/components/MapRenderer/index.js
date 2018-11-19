@@ -10,6 +10,7 @@ class MapRenderer extends Component {
     if(props.canvasWidth !== state.canvasWidth) newState.canvasWidth = props.canvasWidth;
     if(props.mapWidth !== state.mapWidth) newState.mapWidth = props.mapWidth;
     if(props.mapHeight !== state.mapHeight) newState.mapHeight = props.mapHeight;
+    if(props.tileWidth !== state.tileWidth) newState.tileWidth = props.tileWidth;
 
     return (Object.keys(newState).length) ? newState : null;
   }
@@ -23,6 +24,7 @@ class MapRenderer extends Component {
       canvasWidth: props.canvasWidth,
       mapHeight: props.mapHeight,
       mapWidth: props.mapWidth,
+      tileWidth: props.tileWidth,
     };
   }
 
@@ -38,31 +40,31 @@ class MapRenderer extends Component {
     const {
       canvasHeight,
       canvasWidth,
+      tileWidth,
     } = this.state;
     const canvas = this.els.canvas;
     const ctx = canvas.getContext('2d');
     // size of grid is 2:1
-    const gridWidth = 128;
-    const gridHeight = 64;
+    const tileHeight = tileWidth / 2;
 
     const gridTile = document.createElement('canvas');
     const tileCtx = gridTile.getContext('2d');
-    gridTile.width = gridWidth;
-    gridTile.height = gridHeight;
+    gridTile.width = tileWidth;
+    gridTile.height = tileHeight;
     tileCtx.strokeStyle = '#000000';
     tileCtx.lineWidth = 1;
     tileCtx.lineJoin = 'miter';
     tileCtx.beginPath();
-    tileCtx.moveTo(gridWidth/2, 0); // top point
-    tileCtx.lineTo(gridWidth, gridHeight/2); // right point
-    tileCtx.lineTo(gridWidth/2, gridHeight); // bottom point
-    tileCtx.lineTo(0, gridHeight/2); // left point
+    tileCtx.moveTo(tileWidth/2, 0); // top point
+    tileCtx.lineTo(tileWidth, tileHeight/2); // right point
+    tileCtx.lineTo(tileWidth/2, tileHeight); // bottom point
+    tileCtx.lineTo(0, tileHeight/2); // left point
     tileCtx.closePath();
     tileCtx.stroke();
 
     // sprite could be taller
-    const spriteWidth = gridWidth;
-    const spriteHeight = (gridTile.height/gridTile.width) * gridWidth;
+    const spriteWidth = tileWidth;
+    const spriteHeight = (gridTile.height/gridTile.width) * tileWidth;
 
     // size the canvas
     canvas.width = canvasWidth;
@@ -75,7 +77,7 @@ class MapRenderer extends Component {
         ctx.drawImage(
           gridTile,
           offsetX + (x - y) * spriteWidth/2,
-          offsetY + (y + x) * gridHeight/2 - (spriteHeight-gridHeight),
+          offsetY + (y + x) * tileHeight/2 - (spriteHeight - tileHeight),
           spriteWidth,
           spriteHeight
         );
@@ -95,13 +97,15 @@ class MapRenderer extends Component {
 MapRenderer.defaultProps = {
   canvasHeight: 200,
   canvasWidth: 300,
+  mapHeight: 4,
+  mapWidth: 4,
+  tileWidth: 128,
 };
 MapRenderer.propTypes = {
   canvasHeight: number,
   canvasWidth: number,
   mapHeight: number,
   mapWidth: number,
-  tileHeight: number,
   tileWidth: number,
 };
 
