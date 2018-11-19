@@ -23,9 +23,9 @@ const styles = {
     flexDirection: 'column',
 
     ' [data-type="SplitPane"]': {
-      '[data-split="horizontal"] > div': {
-        overflowX: 'auto',
-        overflowY: 'hidden',
+      '[data-split="horizontal"] > .map-pane': {
+        overflow: 'hidden',
+        position: 'relative',
       },
 
       '[data-split="vertical"] > div': {
@@ -98,10 +98,6 @@ const styles = {
       display: 'flex',
       flexDirection: 'column',
     },
-  }),
-
-  mapPane: css({
-    position: 'relative',
   }),
 
   mapPaneLabel: css({

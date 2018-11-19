@@ -1,4 +1,5 @@
 import React, { Component, Fragment } from 'react';
+import { findDOMNode } from 'react-dom';
 import { number, shape, string } from 'prop-types';
 import { connect } from 'react-redux';
 import SplitPane from 'react-split-pane';
@@ -32,14 +33,22 @@ class Builder extends Component {
   constructor(props) {
     super();
 
+    this.els = {};
     this.state = {
+      builderCanvasHeight: 0,
+      builderCanvasWidth: 0,
+      horzPaneSize: '50%',
       mapHeight: props.mapHeight,
       mapWidth: props.mapWidth,
       mounted: false,
+      vertPaneSize: '75%',
     };
 
     globalStyles();
+    this.handleResize = this.handleResize.bind(this);
+    this.handleHorizontalResize = this.handleHorizontalResize.bind(this);
     this.handleMapSizeChange = this.handleMapSizeChange.bind(this);
+    this.handleVerticalResize = this.handleVerticalResize.bind(this);
   }
 
   componentDidMount() {
@@ -66,7 +75,27 @@ class Builder extends Component {
 
     this.setState({
       mounted: true,
+    }, () => {
+      this.setState({
+        ...this.getBuilderPaneDimensions(),
+      });
     });
+    this.mounted = true;
+
+    window.addEventListener('resize', this.handleResize);
+  }
+
+  componentWillUnmount() {
+    this.mounted = false;
+    window.removeEventListener('resize', this.handleResize);
+  }
+
+  getBuilderPaneDimensions() {
+    const pane = findDOMNode(this.els.builderPane); // eslint-disable-line
+    return {
+      builderCanvasHeight: pane.clientHeight,
+      builderCanvasWidth: pane.clientWidth,
+    };
   }
 
   handleMapSizeChange(ev) {
@@ -78,15 +107,57 @@ class Builder extends Component {
     this.setState(state);
   }
 
+  handleHorizontalResize(size) {
+    this.handleResize({
+      size,
+      sizeType: 'horz',
+    });
+  }
+
+  handleVerticalResize(size) {
+    this.handleResize({
+      size,
+      sizeType: 'vert',
+    });
+  }
+
+  handleResize(ev = {}) {
+    if( this.mounted ){
+      if( this.resizeTimeout ) clearTimeout(this.resizeTimeout);
+      const _self = this;
+
+      this.resizeTimeout = setTimeout(() => {
+        const state = {};
+
+        // update pane state first
+        if(ev.sizeType){
+          // TODO - possibly record pane sizes so page reloads persist views
+          state[`${ ev.sizeType }PaneSize`] = ev.size[0];
+          _self.setState(state, _self.handleResize);
+        }
+        // update child els after
+        else{
+          _self.setState({
+            ...this.getBuilderPaneDimensions(),
+          });
+        }
+      }, 50);
+    }
+  }
+
   render() {
     const {
       project,
       projects,
     } = this.props;
     const {
+      builderCanvasWidth,
+      builderCanvasHeight,
+      horzPaneSize,
       mapHeight,
       mapWidth,
       mounted,
+      vertPaneSize,
     } = this.state;
 
     return (
@@ -97,18 +168,30 @@ class Builder extends Component {
         {(mounted && project) && (
           <Fragment>
             <TopNav />
-            <SplitPane split="vertical">
-              <Pane initialSize="75%">
-                <SplitPane split="horizontal">
-                  <Pane className={`map-pane ${ styles.mapPane }`}>
+            <SplitPane
+              split="vertical"
+              onChange={this.handleVerticalResize}
+            >
+              <Pane initialSize={vertPaneSize}>
+                <SplitPane
+                  split="horizontal"
+                  onChange={this.handleHorizontalResize}
+                >
+                  <Pane
+                    ref={(ref) => this.els.builderPane = ref}
+                    initialSize={horzPaneSize}
+                    className="map-pane"
+                  >
                     <div className={`map-pane__label ${ styles.mapPaneLabel }`}>
                       Builder
                     </div>
                     <MapRenderer
+                      canvasWidth={builderCanvasWidth}
+                      canvasHeight={builderCanvasHeight}
                       mapWidth={mapWidth}
                       mapHeight={mapHeight}
                     />
-                    <nav className={`${ styles.builderNav }`}>
+                    <nav className={`builder-nav ${ styles.builderNav }`}>
                       <label>
                         Map Width:
                         <input
@@ -129,7 +212,7 @@ class Builder extends Component {
                       </label>
                     </nav>
                   </Pane>
-                  <Pane className={`map-pane ${ styles.mapPane }`}>
+                  <Pane className="map-pane">
                     <div className={`map-pane__label ${ styles.mapPaneLabel }`}>
                       Preview
                     </div>
