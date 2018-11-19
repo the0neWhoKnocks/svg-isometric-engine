@@ -82,13 +82,27 @@ class Builder extends Component {
     this.setState({
       mounted: true,
     }, () => {
-      this.setState({
-        ...this.getBuilderPaneDimensions(),
-      });
+      if(project){
+        this.setState({
+          ...this.getBuilderPaneDimensions(),
+        });
+      }
     });
     this.mounted = true;
 
     window.addEventListener('resize', this.handleResize);
+  }
+
+  componentDidUpdate(prevProps) {
+    if(
+      !prevProps.project && this.props.project
+      || prevProps.project
+      && prevProps.project.uid !== this.props.project.uid
+    ){
+      this.setState({
+        ...this.getBuilderPaneDimensions(),
+      });
+    }
   }
 
   componentWillUnmount() {
@@ -96,6 +110,9 @@ class Builder extends Component {
     window.removeEventListener('resize', this.handleResize);
   }
 
+  /**
+   * Ensures the map's canvas fits in the pane
+   */
   getBuilderPaneDimensions() {
     const pane = findDOMNode(this.els.builderPane); // eslint-disable-line
     return {
