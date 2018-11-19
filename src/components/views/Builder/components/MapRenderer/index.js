@@ -6,6 +6,8 @@ class MapRenderer extends Component {
   static getDerivedStateFromProps(props, state) {
     const newState = {};
 
+    if(props.canvasHeight !== state.canvasHeight) newState.canvasHeight = props.canvasHeight;
+    if(props.canvasWidth !== state.canvasWidth) newState.canvasWidth = props.canvasWidth;
     if(props.mapWidth !== state.mapWidth) newState.mapWidth = props.mapWidth;
     if(props.mapHeight !== state.mapHeight) newState.mapHeight = props.mapHeight;
 
@@ -17,6 +19,8 @@ class MapRenderer extends Component {
 
     this.els = {};
     this.state = {
+      canvasHeight: props.canvasHeight,
+      canvasWidth: props.canvasWidth,
       mapHeight: props.mapHeight,
       mapWidth: props.mapWidth,
     };
@@ -31,6 +35,10 @@ class MapRenderer extends Component {
   }
 
   renderGrid() {
+    const {
+      canvasHeight,
+      canvasWidth,
+    } = this.state;
     const canvas = this.els.canvas;
     const ctx = canvas.getContext('2d');
     // size of grid is 2:1
@@ -56,18 +64,18 @@ class MapRenderer extends Component {
     const spriteWidth = gridWidth;
     const spriteHeight = (gridTile.height/gridTile.width) * gridWidth;
 
-    // always resize canvas with javascript. using CSS will make it stretch
-    canvas.width = this.els.container.clientWidth;
-    canvas.height = this.els.container.clientHeight;
-    const ox = (canvas.width/2) - (spriteWidth/2);
-    const oy = spriteHeight;
+    // size the canvas
+    canvas.width = canvasWidth;
+    canvas.height = canvasHeight;
+    const offsetX = (canvas.width/2) - (spriteWidth/2); // center of canvas
+    const offsetY = 60;
 
     for(let x=0; x<this.state.mapWidth; x++) {
       for(let y=0; y<this.state.mapHeight; y++) {
         ctx.drawImage(
           gridTile,
-          ox + (x - y) * spriteWidth/2,
-          oy + (y + x) * gridHeight/2 - (spriteHeight-gridHeight),
+          offsetX + (x - y) * spriteWidth/2,
+          offsetY + (y + x) * gridHeight/2 - (spriteHeight-gridHeight),
           spriteWidth,
           spriteHeight
         );
@@ -77,17 +85,20 @@ class MapRenderer extends Component {
 
   render() {
     return (
-      <div
-        className={`${ styles.container }`}
-        ref={(container) => this.els.container = container}
-      >
+      <div className={`map-renderer ${ styles.container }`}>
         <canvas ref={(canvas) => this.els.canvas = canvas} />
       </div>
     );
   }
 }
 
+MapRenderer.defaultProps = {
+  canvasHeight: 200,
+  canvasWidth: 300,
+};
 MapRenderer.propTypes = {
+  canvasHeight: number,
+  canvasWidth: number,
   mapHeight: number,
   mapWidth: number,
   tileHeight: number,
