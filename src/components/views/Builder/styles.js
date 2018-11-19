@@ -119,8 +119,13 @@ const styles = {
     left: 0,
     right: '4px',
 
+    ' label': {
+      margin: '0 0.25em',
+    },
+
     ' input': {
-      width: '3em',
+      width: '4em',
+      textAlign: 'center',
     },
   }),
 };
