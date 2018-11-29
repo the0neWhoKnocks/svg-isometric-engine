@@ -1,5 +1,5 @@
 import React from 'react';
-import { bool, func, shape, string } from 'prop-types';
+import { bool, func, string } from 'prop-types';
 import styles from './styles';
 
 const Tile = ({
@@ -7,7 +7,6 @@ const Tile = ({
   name,
   onSelect,
   src,
-  style,
 }) => {
   const sanitizedName = name
     // remove spaces
@@ -17,7 +16,7 @@ const Tile = ({
   const uid = `tile_${ sanitizedName }`;
 
   return (
-    <div className="tile-container" style={ style }>
+    <div className="tile-container">
       <input
         id={ uid }
         type="checkbox"
@@ -42,10 +41,6 @@ Tile.propTypes = {
   name: string.isRequired,
   onSelect: func.isRequired,
   src: string.isRequired,
-  style: shape({
-    width: string,
-    height: string,
-  }),
 };
 
 export default Tile;
