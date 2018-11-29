@@ -27,6 +27,7 @@ const styles = {
 
       ' button': {
         width: '20%',
+        minWidth: '4em',
       },
     },
   }),
