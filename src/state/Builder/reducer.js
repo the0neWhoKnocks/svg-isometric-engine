@@ -4,6 +4,7 @@ import {
 import reducerLogger from 'UTILS/reducerLogger';
 import { initialState } from './constants';
 import {
+  SET_LAYERS,
   SET_PROJECT,
   SET_PROJECTS,
   SET_TILES,
@@ -13,6 +14,14 @@ export default (state = initialState, action = {}) => {
   const { payload, type } = action;
 
   switch( type ){
+    case SET_LAYERS: {
+      reducerLogger(type, ['layers']);
+      return {
+        ...state,
+        layers: payload,
+      };
+    }
+
     case SET_PROJECT: {
       reducerLogger(type, [
         'project to:', `${ BLUE } "${ JSON.stringify(payload) }"`,

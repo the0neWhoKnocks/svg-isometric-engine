@@ -15,6 +15,7 @@ import store from 'STATE/store';
 import { add as saveData } from 'UTILS/storage';
 import setParam from 'UTILS/setParam';
 import {
+  SET_LAYERS,
   SET_PROJECT,
   SET_PROJECTS,
   SET_TILES,
@@ -105,6 +106,15 @@ const saveProject = (data) => {
     });
 };
 
+const setLayers = (layers) => {
+  const { dispatch } = store.app;
+
+  return dispatch({
+    type: SET_LAYERS,
+    payload: layers,
+  });
+};
+
 const setProject = (project) => {
   const { dispatch } = store.app;
 
@@ -158,6 +168,7 @@ export {
   deleteTile,
   fetchProject,
   saveProject,
+  setLayers,
   setProject,
   setProjects,
   setTiles,
