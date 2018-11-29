@@ -34,6 +34,23 @@ const TILE_WIDTH_MIN = 5;
 const TILE_WIDTH_MAX = 300;
 
 class Builder extends Component {
+  static getDerivedStateFromProps(props, state) {
+    const newState = {};
+
+    if(
+      props.project && !state.project
+      || (
+        props.project && state.project
+        && props.project.uid !== state.project.uid
+      )
+    ) {
+      newState.builderIsVisible = true;
+      newState.project = props.project;
+    }
+
+    return (Object.keys(newState).length) ? newState : null;
+  }
+
   constructor(props) {
     super();
 
@@ -41,22 +58,15 @@ class Builder extends Component {
     this.state = {
       builderCanvasHeight: 0,
       builderCanvasWidth: 0,
+      builderIsVisible: false,
       error: undefined,
       horzPaneSize: '50%',
-      mapHeight: (props.project)
-        ? props.project.map.height
-        : props.mapHeight,
-      mapWidth: (props.project)
-        ? props.project.map.width
-        : props.mapWidth,
-      mounted: false,
+      mapHeight: props.mapHeight,
+      mapWidth: props.mapWidth,
+      project: props.project,
       saving: false,
-      tileWidth: (props.project)
-        ? props.project.map.tileWidth
-        : props.tileWidth,
-      tileWidthVal: (props.project)
-        ? props.project.map.tileWidth
-        : props.tileWidth,
+      tileWidth: props.tileWidth,
+      tileWidthVal: props.tileWidth,
       vertPaneSize: '75%',
     };
 
@@ -72,10 +82,8 @@ class Builder extends Component {
   }
 
   componentDidMount() {
-    const {
-      project,
-      projects,
-    } = this.props;
+    const { projects } = this.props;
+    const { project } = this.state;
 
     if(
       // there are projects to reference
@@ -94,38 +102,63 @@ class Builder extends Component {
     }
 
     this.setState({
-      mounted: true,
+      builderIsVisible: !!project,
     }, () => {
-      if(project){
-        this.setState({
-          ...this.getBuilderPaneDimensions(),
-        });
-      }
+      const { builderIsVisible } = this.state;
+
+      if(builderIsVisible) this.initBuilder();
     });
     this.mounted = true;
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if(
+      this.state.builderIsVisible
+      && ( !prevState.project && this.state.project )
+      || (
+        prevState.project
+        && prevState.project.uid !== this.state.project.uid
+      )
+    ) this.initBuilder();
+  }
+
+  componentWillUnmount() {
+    const { builderIsVisible } = this.state;
+    this.mounted = false;
+
+    if(builderIsVisible){
+      window.removeEventListener('keydown', this.handleKeyBindings);
+      window.removeEventListener('beforeunload', this.handleUnload);
+      window.removeEventListener('resize', this.handleResize);
+    }
+  }
+
+  initBuilder() {
+    const { project } = this.state;
+    let mapProps = {};
+
+    if(project){
+      const {
+        height,
+        tileWidth,
+        width,
+      } = project.map;
+      mapProps = {
+        mapHeight: height,
+        mapWidth: width,
+        tileWidth,
+        tileWidthVal: tileWidth,
+      };
+    }
+
+    this.setState({
+      ...this.getBuilderPaneDimensions(),
+      ...mapProps,
+    });
 
     window.addEventListener('keydown', this.handleKeyBindings);
     window.addEventListener('beforeunload', this.handleUnload);
     window.addEventListener('resize', this.handleResize);
-  }
-
-  componentDidUpdate(prevProps) {
-    if(
-      !prevProps.project && this.props.project
-      || prevProps.project
-      && prevProps.project.uid !== this.props.project.uid
-    ){
-      this.setState({
-        ...this.getBuilderPaneDimensions(),
-      });
-    }
-  }
-
-  componentWillUnmount() {
-    this.mounted = false;
-    window.removeEventListener('keydown', this.handleKeyBindings);
-    window.removeEventListener('beforeunload', this.handleUnload);
-    window.removeEventListener('resize', this.handleResize);
   }
 
   /**
@@ -219,11 +252,17 @@ class Builder extends Component {
       error: undefined,
       saving: true,
     }, () => {
+      const {
+        mapHeight,
+        mapWidth,
+        tileWidth,
+      } = this.state;
+
       saveProject({
         map: {
-          height: this.state.mapHeight,
-          tileWidth: this.state.tileWidth,
-          width: this.state.mapWidth,
+          height: mapHeight,
+          tileWidth: tileWidth,
+          width: mapWidth,
         },
       })
         .then(() => {
@@ -244,20 +283,21 @@ class Builder extends Component {
   }
 
   handleUnload(ev) {
+    const { project } = this.state;
     let customMsg;
 
-    if(this.props.project){
+    if(project){
       // TODO - think of a better way to handle this
       const mapObj = {
         height: this.state.mapHeight,
         tileWidth: this.state.tileWidth,
         width: this.state.mapWidth,
       };
-      const props = Object.keys(this.props.project.map);
+      const props = Object.keys(project.map);
 
       for(let i=0; i<props.length; i++){
         const prop = props[i];
-        if(this.props.project.map[prop] !== mapObj[prop]){
+        if(project.map[prop] !== mapObj[prop]){
           customMsg = 'You have unsaved changes';
           ev.returnValue = customMsg;
           break;
@@ -269,10 +309,7 @@ class Builder extends Component {
   }
 
   render() {
-    const {
-      project,
-      projects,
-    } = this.props;
+    const { projects } = this.props;
     const {
       builderCanvasWidth,
       builderCanvasHeight,
@@ -280,8 +317,8 @@ class Builder extends Component {
       horzPaneSize,
       mapHeight,
       mapWidth,
-      mounted,
       saving,
+      builderIsVisible,
       tileWidth,
       tileWidthVal,
       vertPaneSize,
@@ -304,10 +341,10 @@ class Builder extends Component {
 
     return (
       <div className={`${ styles.root }`}>
-        {(mounted && (!projects || !project)) && (
+        {(this.mounted && !builderIsVisible) && (
           <ProjectSelector projects={ projects } />
         )}
-        {(mounted && project) && (
+        {(this.mounted && builderIsVisible) && (
           <Fragment>
             <TopNav
               onSave={this.handleProjectSave}

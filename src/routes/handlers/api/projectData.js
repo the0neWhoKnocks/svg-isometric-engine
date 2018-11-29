@@ -16,12 +16,8 @@ const handleProjectReadError = (res) => (err) => {
 
 const getProjectData = ({ projectFolder, res }) => {
   readProjectData(projectFolder)
-    .then(({ name, tiles, uid }) => {
-      res.send({
-        name,
-        tiles,
-        uid,
-      });
+    .then((data) => {
+      res.send(data);
     })
     .catch(handleProjectReadError(res));
 };

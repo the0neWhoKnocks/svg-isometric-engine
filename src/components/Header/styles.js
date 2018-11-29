@@ -38,7 +38,7 @@ const styles = {
       background: '#fff',
       boxShadow: '0 5px 2em rgba(0,0,0,0.5)',
       position: 'absolute',
-      bottom: '2em', // account for shadow
+      bottom: headerHeight, // account for shadow
       left: 0,
       right: 0,
       transform: 'translateY(0%)',
@@ -46,7 +46,7 @@ const styles = {
       zIndex: '-1',
 
       '.is--open': {
-        transform: 'translateY(calc(100% + 2em))',
+        transform: `translateY(calc(100% + ${ headerHeight }))`,
       },
     },
   }),
@@ -72,7 +72,7 @@ const styles = {
     height: '100%',
     color: 'currentColor',
     fontWeight: 'bold',
-    lineHeight: '2em',
+    lineHeight: headerHeight,
     textDecoration: 'none',
     padding: '0 1.5em',
     border: 'solid 1px #AAA',
@@ -155,7 +155,8 @@ const styles = {
 
   toggleLabel: css({
     color: '#fff',
-    padding: '1em',
+    lineHeight: headerHeight,
+    padding: '0 0.5em',
     userSelect: 'none',
     cursor: 'pointer',
     display: 'block',
