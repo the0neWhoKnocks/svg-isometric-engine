@@ -6,8 +6,43 @@ const toggleBorderSizePX = `${ toggleBorderSize }px`;
 const toggleAnimSpeed = '0.15s';
 
 const styles = {
-  toggle: css({
+  baseToggle: css({
     display: 'inline-block',
+  }),
+
+  baseLabel: css({
+    cursor: 'pointer',
+    outline: 'none',
+    userSelect: 'none',
+    display: 'block',
+
+    '.is--custom &': {
+      ' .toggle__sprite': {
+        ' > :last-child': {
+          display: 'none',
+        },
+      },
+    },
+  }),
+
+  baseCheckbox: css({
+    marginLeft: '-9999px',
+    visibility: 'hidden',
+    position: 'absolute',
+
+    '.is--custom &': {
+      ':checked + label .toggle__sprite': {
+        ' > :first-child': {
+          display: 'none',
+        },
+        ' > :last-child': {
+          display: 'inline-block',
+        },
+      },
+    },
+  }),
+
+  toggle: css({
     verticalAlign: 'middle',
   }),
 
@@ -17,11 +52,7 @@ const styles = {
     backgroundColor: '#ccc',
     backgroundImage: 'linear-gradient(#ccc, #fff)',
     borderRadius: `${ (toggleRadius / 2) }px`,
-    display: 'block',
     position: 'relative',
-    cursor: 'pointer',
-    outline: 'none',
-    userSelect: 'none',
 
     '::before,::after': {
       content: "''",
@@ -52,10 +83,6 @@ const styles = {
   }),
 
   checkbox: css({
-    marginLeft: '-9999px',
-    visibility: 'hidden',
-    position: 'absolute',
-
     ':checked + label::before': {
       backgroundColor: '#52F28B',
     },

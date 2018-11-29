@@ -1,9 +1,7 @@
 import React, { Component } from 'react';
-import { bool, func, string } from 'prop-types';
+import { bool, func, node, string } from 'prop-types';
 import styles from './styles';
 
-// The Header creates links that can be used to navigate
-// between routes.
 class Toggle extends Component {
   constructor(props) {
     super();
@@ -25,6 +23,7 @@ class Toggle extends Component {
 
   render() {
     const {
+      children,
       id,
       suffix,
     } = this.props;
@@ -32,21 +31,35 @@ class Toggle extends Component {
       toggled,
     } = this.state;
     const toggleId = `${ id }Toggle`;
+    let toggleStyles = `${ styles.baseToggle }`;
+    let checkboxStyles = `${ styles.baseCheckbox }`;
+    let labelStyles = `${ styles.baseLabel }`;
+    let childEl;
+
+    if(!children){
+      toggleStyles += ` ${ styles.toggle }`;
+      checkboxStyles += ` ${ styles.checkbox }`;
+      labelStyles += ` ${ styles.label }`;
+    }
+    else{
+      toggleStyles += ' is--custom';
+      childEl = <div className="toggle__sprite">{ children }</div>;
+    }
 
     return (
       <div className="toggle">
-        <div className={`${ styles.toggle }`}>
+        <div className={ toggleStyles }>
           <input
-            className={`${ styles.checkbox }`}
+            className={ checkboxStyles }
             id={ toggleId }
             type="checkbox"
             onChange={ this.handleToggle }
             checked={ toggled }
           />
           <label
-            className={`${ styles.label }`}
+            className={ labelStyles }
             htmlFor={ toggleId }
-          ></label>
+          >{ childEl }</label>
         </div>
         {suffix && (
           <label>{suffix}</label>
@@ -57,6 +70,7 @@ class Toggle extends Component {
 }
 
 Toggle.propTypes = {
+  children: node,
   id: string,
   suffix: string,
   onToggle: func,
