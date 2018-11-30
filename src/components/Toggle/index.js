@@ -3,10 +3,19 @@ import { bool, func, node, string } from 'prop-types';
 import styles from './styles';
 
 class Toggle extends Component {
+  static getDerivedStateFromProps(props, state) {
+    const newState = {};
+
+    if(props.title !== state.title) newState.title = props.title;
+
+    return (Object.keys(newState).length) ? newState : null;
+  }
+
   constructor(props) {
     super();
 
     this.state = {
+      title: props.title,
       toggled: props.toggled,
     };
     this.handleToggle = this.handleToggle.bind(this);
@@ -28,6 +37,7 @@ class Toggle extends Component {
       suffix,
     } = this.props;
     const {
+      title,
       toggled,
     } = this.state;
     const toggleId = `${ id }Toggle`;
@@ -59,6 +69,7 @@ class Toggle extends Component {
           <label
             className={ labelStyles }
             htmlFor={ toggleId }
+            title={ title }
           >{ childEl }</label>
         </div>
         {suffix && (
@@ -74,6 +85,7 @@ Toggle.propTypes = {
   id: string,
   suffix: string,
   onToggle: func,
+  title: string,
   toggled: bool,
 };
 Toggle.defaultProps = {

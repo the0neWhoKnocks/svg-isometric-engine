@@ -60,16 +60,9 @@ export default {
     margin: SPACING,
     background: '#333',
     overflowX: 'hidden',
+    display: 'flex',
+    flexDirection: 'column-reverse',
+    justifyContent: 'flex-end',
     flexGrow: 1,
-
-    // ' .tile-container': {
-    //   '.delete--started': {
-    //     transition: `transform ${ DELETE_DURATION }ms`,
-    //   },
-    //
-    //   '.is--deleting': {
-    //     transform: 'scale(0) rotate(360deg)',
-    //   },
-    // },
   }),
 };

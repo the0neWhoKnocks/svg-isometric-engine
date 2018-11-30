@@ -16,6 +16,7 @@ import {
   saveProject,
 } from 'STATE/Builder/actions';
 import {
+  getLayerName,
   getProject,
   getProjects,
 } from 'STATE/Builder/selectors';
@@ -26,6 +27,7 @@ import TopNav from './components/TopNav';
 import styles, { globals as globalStyles } from './styles';
 
 const builderProps = (state) => ({
+  layerName: getLayerName(state),
   project: getProject(state),
   projects: getProjects(state),
 });
@@ -309,7 +311,10 @@ class Builder extends Component {
   }
 
   render() {
-    const { projects } = this.props;
+    const {
+      layerName,
+      projects,
+    } = this.props;
     const {
       builderCanvasWidth,
       builderCanvasHeight,
@@ -364,7 +369,7 @@ class Builder extends Component {
                     className="map-pane"
                   >
                     <div className={`map-pane__label ${ styles.mapPaneLabel }`}>
-                      Builder
+                      {`Builder${ (layerName) ? ` | ${ layerName }` : '' }`}
                     </div>
                     <MapRenderer
                       canvasWidth={builderCanvasWidth}
@@ -422,14 +427,14 @@ class Builder extends Component {
                     className={`${ styles.tabs }`}
                     items={[
                       {
-                        content: <TilesBrowser />,
-                        icon: 'photo_library',
-                        label: 'Tiles',
-                      },
-                      {
                         content: <Layers />,
                         icon: 'layers',
                         label: 'Layers',
+                      },
+                      {
+                        content: <TilesBrowser />,
+                        icon: 'photo_library',
+                        label: 'Tiles',
                       },
                     ]}
                   />
@@ -458,6 +463,7 @@ Builder.propTypes = {
     status: number,
     statusText: string,
   }),
+  layerName: string,
   mapHeight: number,
   mapWidth: number,
   project: PROJECT,

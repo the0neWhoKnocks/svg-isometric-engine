@@ -16,9 +16,20 @@ export default (state = initialState, action = {}) => {
   switch( type ){
     case SET_LAYERS: {
       reducerLogger(type, ['layers']);
+      const layers = payload;
+      let currentLayer = {};
+
+      for(let i=0; i<layers.length; i++){
+        if(layers[i].current){
+          currentLayer = layers[i];
+          break;
+        }
+      }
+
       return {
         ...state,
-        layers: payload,
+        currentLayer,
+        layers,
       };
     }
 

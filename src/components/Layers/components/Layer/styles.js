@@ -11,6 +11,14 @@ const styles = {
       borderLeftColor: DARK_THEME__ACCENT_COLOR,
       backgroundColor: '#ffffff15',
     },
+
+    ':disabled + .layer': {
+      cursor: 'default',
+
+      ' .layer__name': {
+        opacity: 0.5,
+      },
+    },
   }),
 
   layer: css({
@@ -18,6 +26,7 @@ const styles = {
     height: '100%',
     padding: '0.15em 0.25em 0.15em 0',
     borderLeft: 'solid 0.15em transparent',
+    margin: '1px 0',
     backgroundColor: '#0000004a',
     display: 'flex',
     alignItems: 'center',
@@ -67,6 +76,11 @@ const styles = {
       fill: '#ccc',
       padding: '0.25em',
       boxSizing: 'content-box',
+
+      '.is--disabled': {
+        fill: '#ffffff50',
+        border: 'solid 1px transparent',
+      },
     },
 
     ' .layer__name': {
@@ -77,9 +91,11 @@ const styles = {
       borderRadius: '0.2em',
       overflow: 'hidden',
       pointerEvents: 'all',
+      userSelect: 'none',
 
       ':focus': {
         color: '#000',
+        cursor: 'text',
         outline: 'none',
         background: '#ffffff90',
       },

@@ -13,28 +13,26 @@ class Layer extends Component {
 
     this.state = {
       editName: false,
-      locked: props.locked,
-      name: props.name,
-      ndx: props.ndx,
-      visible: props.visible,
     };
 
-    this.handleLock = this.handleLock.bind(this);
-    this.handleNameBlur = this.handleNameBlur.bind(this);
-    this.handleNameChange = this.handleNameChange.bind(this);
-    this.handleNameClick = this.handleNameClick.bind(this);
-    this.handleNameKeys = this.handleNameKeys.bind(this);
+    if(props.editable){
+      this.handleLayerSelect = this.handleLayerSelect.bind(this);
+      this.handleLock = this.handleLock.bind(this);
+      this.handleNameBlur = this.handleNameBlur.bind(this);
+      this.handleNameClick = this.handleNameClick.bind(this);
+      this.handleNameKeys = this.handleNameKeys.bind(this);
+    }
     this.handleVisibility = this.handleVisibility.bind(this);
   }
 
-  handleLock(locked) {
-    this.props.onLock(this.state.ndx, locked);
+  handleLayerSelect(ev) {
+    if(ev.target.classList.contains('layer__name')){
+      ev.preventDefault();
+    }
   }
 
-  handleNameChange(ev) {
-    this.setState({
-      name: ev.currentTarget.value,
-    });
+  handleLock(locked) {
+    this.props.onLock(this.props.ndx, locked);
   }
 
   handleNameClick(ev) {
@@ -48,34 +46,42 @@ class Layer extends Component {
   handleNameKeys(ev) {
     if(ev.which === 13) {
       ev.preventDefault(); // prevent new lines
-      this.setState({
-        editName: false,
-      });
+      this.handleNameUpdate();
     }
   }
 
   handleNameBlur(ev) {
+    this.handleNameUpdate();
+  }
+
+  handleNameUpdate() {
     this.setState({
       editName: false,
+    }, () => {
+      const newName = this.nameInput.innerText;
+      if(newName !== this.props.name){
+        this.props.onNameChange(this.props.ndx, newName);
+      }
     });
   }
 
   handleVisibility(visible) {
-    this.props.onVisibility(this.state.ndx, visible);
+    this.props.onVisibility(this.props.ndx, visible);
   }
 
   render() {
     const {
       current,
-      onSelect,
-      thumbnail,
-    } = this.props;
-    const {
+      editable,
       locked,
       name,
-      editName,
       ndx,
+      onSelect,
+      thumbnail,
       visible,
+    } = this.props;
+    const {
+      editName,
     } = this.state;
     const uid = `layer_${ ndx }`;
 
@@ -88,16 +94,18 @@ class Layer extends Component {
           checked={ current }
           onChange={ onSelect }
           value={ ndx }
+          disabled={ !editable }
         />
         <label
           className={`layer ${ styles.layer }`}
           htmlFor={ uid }
-          title={ name }
+          onClick={ this.handleLayerSelect }
         >
           <nav className="layer__nav">
             <Toggle
               id={`${ uid }_vis`}
               onToggle={ this.handleVisibility }
+              title={ `${ (visible) ? 'Hide' : 'Show' } Layer` }
               toggled={ visible }
             >
               <SvgIcon
@@ -109,20 +117,29 @@ class Layer extends Component {
                 name="visibility"
               />
             </Toggle>
-            <Toggle
-              id={`${ uid }_lock`}
-              onToggle={ this.handleLock }
-              toggled={ locked }
-            >
+            {editable && (
+              <Toggle
+                id={`${ uid }_lock`}
+                onToggle={ this.handleLock }
+                title={ `${ (locked) ? 'Un-Lock' : 'Lock' } Layer` }
+                toggled={ locked }
+              >
+                <SvgIcon
+                  className="layer__toggle-icon"
+                  name="unlocked"
+                />
+                <SvgIcon
+                  className="layer__toggle-icon"
+                  name="locked"
+                />
+              </Toggle>
+            )}
+            {!editable && (
               <SvgIcon
-                className="layer__toggle-icon"
-                name="unlocked"
-              />
-              <SvgIcon
-                className="layer__toggle-icon"
+                className="layer__toggle-icon is--disabled"
                 name="locked"
               />
-            </Toggle>
+            )}
           </nav>
           <div className="layer__thumbnail-wrapper">
             <img className="layer__thumbnail" src={ thumbnail } alt="thumbnail" />
@@ -133,9 +150,10 @@ class Layer extends Component {
             contentEditable={ editName }
             suppressContentEditableWarning={true}
             spellCheck="false"
-            onBlur={ this.handleNameBlur }
-            onDoubleClick={ this.handleNameClick }
-            onKeyDown={ this.handleNameKeys }
+            title={ (editable) ? 'Double-click to edit layer name' : undefined}
+            onBlur={ (editable) ? this.handleNameBlur : undefined }
+            onDoubleClick={ (editable) ? this.handleNameClick : undefined }
+            onKeyDown={ (editable) ? this.handleNameKeys : undefined }
           >
             { name }
           </div>
@@ -145,24 +163,17 @@ class Layer extends Component {
   }
 }
 
-{/* <input
-  ref={ (ref) => this.nameInput = ref }
-  className="layer__name"
-  type="text"
-  value={ name }
-  onChange={ this.handleNameChange }
-  onBlur={ this.handleNameBlur }
-  disabled={ nameDisabled }
-  size="1"
-/> */}
-
 Layer.defaultProps = {
+  current: false,
+  editable: true,
   locked: false,
   visible: true,
 };
 Layer.propTypes = {
   current: bool,
+  editable: bool,
   onLock: func.isRequired,
+  onNameChange: func.isRequired,
   onSelect: func.isRequired,
   onVisibility: func.isRequired,
   ...RAW_LAYER,
