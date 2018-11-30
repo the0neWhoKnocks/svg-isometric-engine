@@ -18,29 +18,130 @@ const layersProps = (state) => ({
   layers: getLayers(state),
 });
 
-const defaultLayer = {
-  locked: false,
-  name: 'Layer 1',
+const gridLayer = {
+  editable: false,
+  name: 'Grid',
+  tiles: [],
   visible: true,
 };
 
 class Layers extends Component {
+  static createLayer(layers) {
+    const _layer = {
+      current: true,
+      locked: false,
+      visible: true,
+    };
+    let count = 1;
+
+    layers.forEach((layer, ndx) => {
+      const match = layer.name.match(/^Layer (\d+)$/i);
+      layer.current = false;
+      layer.ndx = ndx;
+
+      // Find any layers with the matching default name pattern and increment
+      // it by one.
+      if(match && match[1] && +match[1] >= count) count = +match[1] + 1;
+    });
+
+    _layer.name = `Layer ${ count }`;
+    _layer.ndx = layers.length;
+
+    layers.push(_layer);
+
+    return layers;
+  }
+
+  static getSelectedLayer(layers) {
+    let selectedLayer;
+
+    for(let i=0; i<layers.length; i++){
+      if(layers[i].current){
+        selectedLayer = i;
+        break;
+      }
+    }
+
+    return selectedLayer;
+  }
+
+  static getDerivedStateFromProps(props, state) {
+    const newState = {};
+    const current = Layers.getSelectedLayer(props.layers);
+
+    if(current !== state.selectedLayer) newState.selectedLayer = current;
+
+    return (Object.keys(newState).length) ? newState : null;
+  }
+
   constructor(props) {
     super();
 
+    let layers = (props.layers.length)
+      ? props.layers
+      : Layers.createLayer([...props.layers]);
+
+    // the grid will always be inserted as the first non-editable layer.
+    if(layers[0].name !== gridLayer.name){
+      layers = [gridLayer, ...layers];
+      layers.forEach((layer, ndx) => layer.ndx = ndx);
+    }
+
     this.state = {
-      layers: (props.layers.length) ? props.layers : [{ ...defaultLayer }],
-      selectedLayer: undefined,
+      layers,
+      selectedLayer: Layers.getSelectedLayer(layers),
     };
 
     this.handleLayerDelete = this.handleLayerDelete.bind(this);
     this.handleLayerLock = this.handleLayerLock.bind(this);
     this.handleLayerSelect = this.handleLayerSelect.bind(this);
     this.handleLayerVisibility = this.handleLayerVisibility.bind(this);
+    this.handleNameChange = this.handleNameChange.bind(this);
+    this.handleNewLayer = this.handleNewLayer.bind(this);
+  }
+
+  componentDidMount() {
+    // only set layers if this is a fresh/empty project
+    if(!this.props.layers.length) this.updateLayers();
+  }
+
+  handleNewLayer() {
+    Layers.createLayer(this.state.layers);
+    this.updateLayers();
   }
 
   handleLayerDelete(ev) {
+    const layers = [...this.state.layers];
+    let selectedLayer = this.state.selectedLayer;
+    layers.splice(selectedLayer, 1);
+    const nextLayer = layers[selectedLayer - 1];
+    const parentLayer = layers[selectedLayer];
 
+    // always select the next layer
+    if(
+      nextLayer
+      && nextLayer.editable === undefined
+    ){
+      nextLayer.current = true;
+    }
+    // fallback to a parent layer
+    else if(
+      !nextLayer.editable
+      && parentLayer
+    ){
+      parentLayer.current = true;
+    }
+
+    layers.forEach((layer, ndx) => {
+      layer.ndx = ndx;
+    });
+
+    this.setState({
+      layers,
+      selectedLayer,
+    }, () => {
+      this.updateLayers();
+    });
   }
 
   handleLayerLock(ndx, locked) {
@@ -49,24 +150,35 @@ class Layers extends Component {
 
   handleLayerSelect(ev) {
     const el = ev.currentTarget;
-    const uid = +el.value;
-    let selectedLayer = uid;
+    const ndx = +el.value;
+    let selectedLayer = ndx;
 
-    // allows for de-selecting a currently select layer
-    if(selectedLayer === this.state.selectedLayer) selectedLayer = undefined;
+    if(selectedLayer !== this.state.selectedLayer){
+      const layers = [...this.state.layers];
+      delete layers[this.state.selectedLayer].current;
+      layers[selectedLayer].current = true;
 
-    this.setState({
-      selectedLayer,
-    });
+      this.setState({
+        layers,
+        selectedLayer,
+      }, () => {
+        this.updateLayers();
+      });
+    }
   }
 
   handleLayerVisibility(ndx, visible) {
     this.updateLayers(ndx, 'visible', visible);
   }
 
+  handleNameChange(ndx, name) {
+    this.updateLayers(ndx, 'name', name);
+  }
+
   updateLayers(ndx, prop, val) {
     const layers = [...this.state.layers];
-    layers[ndx][prop] = val;
+    // args will be undefined when adding/deleting layers
+    if(ndx) layers[ndx][prop] = val;
     setLayers(layers);
   }
 
@@ -105,16 +217,14 @@ class Layers extends Component {
           </div>
         </nav>
         <div className={`layers__items ${ styles.items }`}>
-          {layers.map(({ name, tiles }, layerNdx) => (
+          {layers.map((layerProps, layerNdx) => (
             <Layer
               key={ layerNdx }
-              current={ layerNdx === selectedLayer }
-              name={ name }
-              ndx={ layerNdx }
               onLock={ this.handleLayerLock }
+              onNameChange={ this.handleNameChange }
               onSelect={ this.handleLayerSelect }
               onVisibility={ this.handleLayerVisibility }
-              thumbnail=""
+              { ...layerProps }
             />
           ))}
         </div>
