@@ -5,6 +5,7 @@ import reducerLogger from 'UTILS/reducerLogger';
 import { initialState } from './constants';
 import {
   SET_LAYERS,
+  SET_LAYER_THUMB,
   SET_PROJECT,
   SET_PROJECTS,
   SET_TILES,
@@ -30,6 +31,19 @@ export default (state = initialState, action = {}) => {
         ...state,
         currentLayer,
         layers,
+      };
+    }
+
+    case SET_LAYER_THUMB: {
+      reducerLogger(type, ['layer-thumb']);
+      const { ndx, thumb } = payload;
+      const layerThumbs = [...state.layerThumbs];
+
+      layerThumbs[ndx] = thumb;
+
+      return {
+        ...state,
+        layerThumbs,
       };
     }
 

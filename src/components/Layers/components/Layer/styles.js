@@ -3,6 +3,11 @@ import {
   DARK_THEME__ACCENT_COLOR,
 } from 'CONSTANTS/styles';
 
+const layerToggle = {
+  margin: '0 1px',
+  background: '#0000007a',
+};
+
 const styles = {
   layerInput: css({
     display: 'none',
@@ -46,7 +51,7 @@ const styles = {
       flexShrink: 0,
 
       ' .toggle__sprite': {
-        border: 'solid 1px',
+        ...layerToggle,
 
         ' > :first-child': {
           opacity: 0.5,
@@ -58,12 +63,14 @@ const styles = {
       width: '1em',
       height: '1em',
       padding: '0.25em',
-      border: 'solid 1px #ffffff42',
       overflow: 'hidden',
-      display: 'inline-block',
       verticalAlign: 'top',
-      flexShrink: 0,
       boxSizing: 'content-box',
+      background: '#ffffff14',
+      display: 'flex',
+      flexDirection: 'column',
+      flexShrink: 0,
+      justifyContent: 'center',
     },
 
     ' .layer__thumbnail': {
@@ -79,7 +86,7 @@ const styles = {
 
       '.is--disabled': {
         fill: '#ffffff50',
-        border: 'solid 1px transparent',
+        ...layerToggle,
       },
     },
 

@@ -142,7 +142,9 @@ class Layer extends Component {
             )}
           </nav>
           <div className="layer__thumbnail-wrapper">
-            <img className="layer__thumbnail" src={ thumbnail } alt="thumbnail" />
+            {thumbnail && (
+              <img className="layer__thumbnail" src={ thumbnail } alt="thumbnail" />
+            )}
           </div>
           <div
             ref={ (ref) => this.nameInput = ref }

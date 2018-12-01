@@ -16,6 +16,7 @@ import { add as saveData } from 'UTILS/storage';
 import setParam from 'UTILS/setParam';
 import {
   SET_LAYERS,
+  SET_LAYER_THUMB,
   SET_PROJECT,
   SET_PROJECTS,
   SET_TILES,
@@ -115,6 +116,18 @@ const setLayers = (layers) => {
   });
 };
 
+const setLayerThumb = (ndx, thumb) => {
+  const { dispatch } = store.app;
+
+  return dispatch({
+    type: SET_LAYER_THUMB,
+    payload: {
+      ndx,
+      thumb,
+    },
+  });
+};
+
 const setProject = (project) => {
   const { dispatch } = store.app;
 
@@ -169,6 +182,7 @@ export {
   fetchProject,
   saveProject,
   setLayers,
+  setLayerThumb,
   setProject,
   setProjects,
   setTiles,
