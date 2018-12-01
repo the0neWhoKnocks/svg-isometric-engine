@@ -1,21 +1,26 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { arrayOf } from 'prop-types';
+import { arrayOf, string } from 'prop-types';
 import SvgIcon from 'COMPONENTS/SvgIcon';
 import {
   LAYER,
+  PROJECT,
 } from 'CONSTANTS/propTypes';
 import {
   setLayers,
 } from 'STATE/Builder/actions';
 import {
   getLayers,
+  getLayerThumbs,
+  getProject,
 } from 'STATE/Builder/selectors';
 import Layer from './components/Layer';
 import styles from './styles';
 
 const layersProps = (state) => ({
   layers: getLayers(state),
+  layerThumbs: getLayerThumbs(state),
+  project: getProject(state),
 });
 
 const gridLayer = {
@@ -52,6 +57,15 @@ class Layers extends Component {
     return layers;
   }
 
+  static getDerivedStateFromProps(props, state) {
+    const newState = {};
+    const current = Layers.getSelectedLayer(props.layers);
+
+    if(current !== state.selectedLayer) newState.selectedLayer = current;
+
+    return (Object.keys(newState).length) ? newState : null;
+  }
+
   static getSelectedLayer(layers) {
     let selectedLayer;
 
@@ -65,13 +79,37 @@ class Layers extends Component {
     return selectedLayer;
   }
 
-  static getDerivedStateFromProps(props, state) {
-    const newState = {};
-    const current = Layers.getSelectedLayer(props.layers);
+  static populateGridTiles({
+    mapColumns,
+    mapRows,
+    tileHeight,
+    tileWidth,
+  }) {
+    const tiles = [];
+    const gridTile = document.createElement('canvas');
+    const tileCtx = gridTile.getContext('2d');
+    gridTile.width = tileWidth;
+    gridTile.height = tileHeight;
+    tileCtx.strokeStyle = '#000000';
+    tileCtx.lineWidth = 1;
+    tileCtx.lineJoin = 'miter';
+    tileCtx.beginPath();
+    tileCtx.moveTo(tileWidth/2, 0); // top point
+    tileCtx.lineTo(tileWidth, tileHeight/2); // right point
+    tileCtx.lineTo(tileWidth/2, tileHeight); // bottom point
+    tileCtx.lineTo(0, tileHeight/2); // left point
+    tileCtx.closePath();
+    tileCtx.stroke();
 
-    if(current !== state.selectedLayer) newState.selectedLayer = current;
+    for(let row=0; row<mapRows; row++) {
+      const rowArr = [];
+      for(let col=0; col<mapColumns; col++) {
+        rowArr.push(gridTile);
+      }
+      tiles.push(rowArr);
+    }
 
-    return (Object.keys(newState).length) ? newState : null;
+    return tiles;
   }
 
   constructor(props) {
@@ -83,6 +121,20 @@ class Layers extends Component {
 
     // the grid will always be inserted as the first non-editable layer.
     if(layers[0].name !== gridLayer.name){
+      const { project } = props;
+      const {
+        height: mapRows,
+        tileWidth,
+        width: mapColumns,
+      } = project.map;
+      const tileHeight = tileWidth / 2;
+      gridLayer.tiles = Layers.populateGridTiles({
+        mapColumns,
+        mapRows,
+        tileHeight,
+        tileWidth,
+      });
+
       layers = [gridLayer, ...layers];
       layers.forEach((layer, ndx) => layer.ndx = ndx);
     }
@@ -178,11 +230,14 @@ class Layers extends Component {
   updateLayers(ndx, prop, val) {
     const layers = [...this.state.layers];
     // args will be undefined when adding/deleting layers
-    if(ndx) layers[ndx][prop] = val;
+    if(ndx !== undefined) layers[ndx][prop] = val;
     setLayers(layers);
   }
 
   render() {
+    const {
+      layerThumbs,
+    } = this.props;
     const {
       layers,
       selectedLayer,
@@ -224,6 +279,7 @@ class Layers extends Component {
               onNameChange={ this.handleNameChange }
               onSelect={ this.handleLayerSelect }
               onVisibility={ this.handleLayerVisibility }
+              thumbnail={ layerThumbs[layerNdx] }
               { ...layerProps }
             />
           ))}
@@ -235,6 +291,8 @@ class Layers extends Component {
 
 Layers.propTypes = {
   layers: arrayOf(LAYER),
+  layerThumbs: arrayOf(string),
+  project: PROJECT,
 };
 
 export default connect(layersProps)(Layers);

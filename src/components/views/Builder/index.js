@@ -1,6 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import { findDOMNode } from 'react-dom';
-import { number, shape, string } from 'prop-types';
+import { arrayOf, number, shape, string } from 'prop-types';
 import { connect } from 'react-redux';
 import SplitPane from 'react-split-pane';
 import Pane from 'react-split-pane/lib/Pane';
@@ -8,15 +8,18 @@ import Layers from 'COMPONENTS/Layers';
 import Tabs from 'COMPONENTS/Tabs';
 import TilesBrowser from 'COMPONENTS/TilesBrowser';
 import {
+  LAYER,
   PROJECT,
   PROJECTS,
 } from 'CONSTANTS/propTypes';
 import {
   fetchProject,
   saveProject,
+  setLayerThumb,
 } from 'STATE/Builder/actions';
 import {
   getLayerName,
+  getLayers,
   getProject,
   getProjects,
 } from 'STATE/Builder/selectors';
@@ -28,6 +31,7 @@ import styles, { globals as globalStyles } from './styles';
 
 const builderProps = (state) => ({
   layerName: getLayerName(state),
+  layers: getLayers(state),
   project: getProject(state),
   projects: getProjects(state),
 });
@@ -75,6 +79,7 @@ class Builder extends Component {
     globalStyles();
     this.handleHorizontalResize = this.handleHorizontalResize.bind(this);
     this.handleKeyBindings = this.handleKeyBindings.bind(this);
+    this.handleLayerRender = this.handleLayerRender.bind(this);
     this.handleMapSizeChange = this.handleMapSizeChange.bind(this);
     this.handleProjectSave = this.handleProjectSave.bind(this);
     this.handleResize = this.handleResize.bind(this);
@@ -172,6 +177,28 @@ class Builder extends Component {
       builderCanvasHeight: pane.clientHeight,
       builderCanvasWidth: pane.clientWidth,
     };
+  }
+
+  handleLayerRender(ndx, layer) {
+    const maxSize = 20;
+    let thumbWidth, thumbHeight;
+
+    if(layer.width > layer.height){
+      thumbWidth = maxSize;
+      thumbHeight = layer.height * (maxSize / layer.width);
+    }
+    else{
+      thumbWidth = layer.width * (maxSize / layer.height);
+      thumbHeight = maxSize;
+    }
+
+    const thumb = document.createElement('canvas');
+    const ctx = thumb.getContext('2d', { alpha: false });
+    thumb.width = Math.floor(thumbWidth);
+    thumb.height = Math.floor(thumbHeight);
+    ctx.drawImage(layer, 0, 0, thumbWidth, thumbHeight);
+
+    setLayerThumb(ndx, thumb.toDataURL());
   }
 
   handleMapSizeChange(ev) {
@@ -313,6 +340,7 @@ class Builder extends Component {
   render() {
     const {
       layerName,
+      layers,
       projects,
     } = this.props;
     const {
@@ -374,8 +402,10 @@ class Builder extends Component {
                     <MapRenderer
                       canvasWidth={builderCanvasWidth}
                       canvasHeight={builderCanvasHeight}
+                      layers={layers}
                       mapWidth={mapWidth}
                       mapHeight={mapHeight}
+                      onLayerRender={this.handleLayerRender}
                       tileWidth={tileWidth}
                     />
                     <nav className={`builder-nav ${ styles.builderNav }`}>
@@ -464,6 +494,7 @@ Builder.propTypes = {
     statusText: string,
   }),
   layerName: string,
+  layers: arrayOf(LAYER),
   mapHeight: number,
   mapWidth: number,
   project: PROJECT,
