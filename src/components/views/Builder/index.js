@@ -14,10 +14,13 @@ import {
 } from 'CONSTANTS/propTypes';
 import {
   fetchProject,
+  setCurrentTile,
   saveProject,
   setLayerThumb,
 } from 'STATE/Builder/actions';
 import {
+  getCurrentTileName,
+  getCurrentTilePath,
   getLayerName,
   getLayers,
   getProject,
@@ -30,6 +33,8 @@ import TopNav from './components/TopNav';
 import styles, { globals as globalStyles } from './styles';
 
 const builderProps = (state) => ({
+  currentTileName: getCurrentTileName(state),
+  currentTilePath: getCurrentTilePath(state),
   layerName: getLayerName(state),
   layers: getLayers(state),
   project: getProject(state),
@@ -83,6 +88,7 @@ class Builder extends Component {
     this.handleMapSizeChange = this.handleMapSizeChange.bind(this);
     this.handleProjectSave = this.handleProjectSave.bind(this);
     this.handleResize = this.handleResize.bind(this);
+    this.handleTileSelect = this.handleTileSelect.bind(this);
     this.handleTileWidthChange = this.handleTileWidthChange.bind(this);
     this.handleUnload = this.handleUnload.bind(this);
     this.handleVerticalResize = this.handleVerticalResize.bind(this);
@@ -248,6 +254,10 @@ class Builder extends Component {
     }
   }
 
+  handleTileSelect(tile) {
+    setCurrentTile(tile);
+  }
+
   handleTileWidthChange(ev) {
     const val = +ev.currentTarget.value;
     const state = { tileWidthVal: val };
@@ -339,6 +349,8 @@ class Builder extends Component {
 
   render() {
     const {
+      currentTileName,
+      currentTilePath,
       layerName,
       layers,
       projects,
@@ -402,6 +414,7 @@ class Builder extends Component {
                     <MapRenderer
                       canvasWidth={builderCanvasWidth}
                       canvasHeight={builderCanvasHeight}
+                      currentTilePath={currentTilePath}
                       layers={layers}
                       mapWidth={mapWidth}
                       mapHeight={mapHeight}
@@ -462,7 +475,12 @@ class Builder extends Component {
                         label: 'Layers',
                       },
                       {
-                        content: <TilesBrowser />,
+                        content: (
+                          <TilesBrowser
+                            currentTileName={ currentTileName }
+                            onTileSelect={ this.handleTileSelect }
+                          />
+                        ),
                         icon: 'photo_library',
                         label: 'Tiles',
                       },
@@ -488,6 +506,8 @@ Builder.defaultProps = {
 };
 
 Builder.propTypes = {
+  currentTileName: string,
+  currentTilePath: string,
   dialogError: shape({
     data: string,
     status: number,

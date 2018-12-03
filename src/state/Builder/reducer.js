@@ -4,6 +4,7 @@ import {
 import reducerLogger from 'UTILS/reducerLogger';
 import { initialState } from './constants';
 import {
+  SET_CURRENT_TILE,
   SET_LAYERS,
   SET_LAYER_THUMB,
   SET_PROJECT,
@@ -15,6 +16,15 @@ export default (state = initialState, action = {}) => {
   const { payload, type } = action;
 
   switch( type ){
+    case SET_CURRENT_TILE: {
+      reducerLogger(type, ['current-tile']);
+
+      return {
+        ...state,
+        currentTile: payload,
+      };
+    }
+
     case SET_LAYERS: {
       reducerLogger(type, ['layers']);
       const layers = payload;

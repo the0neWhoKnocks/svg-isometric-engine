@@ -15,6 +15,7 @@ import store from 'STATE/store';
 import { add as saveData } from 'UTILS/storage';
 import setParam from 'UTILS/setParam';
 import {
+  SET_CURRENT_TILE,
   SET_LAYERS,
   SET_LAYER_THUMB,
   SET_PROJECT,
@@ -116,6 +117,15 @@ const setLayers = (layers) => {
   });
 };
 
+const setCurrentTile = (tile) => {
+  const { dispatch } = store.app;
+
+  return dispatch({
+    type: SET_CURRENT_TILE,
+    payload: tile,
+  });
+};
+
 const setLayerThumb = (ndx, thumb) => {
   const { dispatch } = store.app;
 
@@ -181,6 +191,7 @@ export {
   deleteTile,
   fetchProject,
   saveProject,
+  setCurrentTile,
   setLayers,
   setLayerThumb,
   setProject,
