@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { arrayOf, func, number } from 'prop-types';
+import { arrayOf, func, number, string } from 'prop-types';
 import {
   LAYER,
 } from 'CONSTANTS/propTypes';
@@ -13,11 +13,63 @@ class MapRenderer extends Component {
   }
 
   componentDidMount() {
+    this.handleMouseLeave = this.handleMouseLeave.bind(this);
+    this.handleMouseMove = this.handleMouseMove.bind(this);
+    this.handleMouseOver = this.handleMouseOver.bind(this);
+
     this.renderLayers();
   }
 
   componentDidUpdate() {
     this.renderLayers();
+  }
+
+  handleMouseLeave(ev) {
+    this.tileCtx.clearRect(0, 0, this.tileCanvas.width, this.tileCanvas.height);
+  }
+
+  handleMouseMove(ev) {
+    this.renderTileBrush(ev.nativeEvent.offsetX, ev.nativeEvent.offsetY);
+  }
+
+  handleMouseOver(ev) {
+    const {
+      canvasHeight,
+      canvasWidth,
+      currentTilePath,
+    } = this.props;
+
+    this.tileCanvas = this.els.tileCanvas;
+    this.tileCtx = this.tileCanvas.getContext('2d');
+    this.tileCanvas.width = canvasWidth;
+    this.tileCanvas.height = canvasHeight;
+
+    if(currentTilePath){
+      if(currentTilePath !== this.currentTilePath){
+        this.currentTilePath = currentTilePath;
+
+        const tileImage = new Image();
+        tileImage.addEventListener('load', () => {
+          this.tileBrush = document.createElement('canvas');
+          this.tileBrushCtx = this.tileBrush.getContext('2d');
+          this.tileBrush.width = tileImage.width;
+          this.tileBrush.height = tileImage.height;
+          this.tileBrushCtx.drawImage(tileImage, 0, 0);
+        });
+        tileImage.src = currentTilePath;
+      }
+
+      this.renderTileBrush(ev.nativeEvent.offsetX, ev.nativeEvent.offsetY);
+    }
+  }
+
+  renderTileBrush(xPos, yPos) {
+    this.tileCtx.clearRect(0, 0, this.tileCanvas.width, this.tileCanvas.height);
+    if(this.tileBrush) {
+      const centerX = xPos - (this.tileBrush.width / 2);
+      const centerY = yPos - (this.tileBrush.height / 2);
+      this.tileCtx.drawImage(this.tileBrush, centerX, centerY);
+    }
   }
 
   renderLayers() {
@@ -88,8 +140,17 @@ class MapRenderer extends Component {
 
   render() {
     return (
-      <div className={`map-renderer ${ styles.container }`}>
+      <div
+        className={`map-renderer ${ styles.container }`}
+        onMouseLeave={this.handleMouseLeave}
+        onMouseMove={this.handleMouseMove}
+        onMouseOver={this.handleMouseOver}
+      >
         <canvas ref={(canvas) => this.els.canvas = canvas} />
+        <canvas
+          ref={(canvas) => this.els.tileCanvas = canvas}
+          className="map-renderer__tile"
+        />
       </div>
     );
   }
@@ -105,6 +166,7 @@ MapRenderer.defaultProps = {
 MapRenderer.propTypes = {
   canvasHeight: number,
   canvasWidth: number,
+  currentTilePath: string,
   layers: arrayOf(LAYER),
   mapHeight: number,
   mapWidth: number,

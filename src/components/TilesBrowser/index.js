@@ -4,7 +4,7 @@ import {
   CSSTransition,
   TransitionGroup,
 } from 'react-transition-group';
-import { arrayOf, number, shape, string } from 'prop-types';
+import { arrayOf, func, number, shape, string } from 'prop-types';
 import axios from 'axios';
 import ProgressIndicator from 'COMPONENTS/ProgressIndicator';
 import SvgIcon from 'COMPONENTS/SvgIcon';
@@ -32,6 +32,8 @@ const browserProps = (state) => ({
 
 const FILE_TYPES = 'image/*';
 class TilesBrowser extends Component {
+  static tilePath = (uid, name) => `/projects/${ uid }/tiles/${ name }`;
+
   constructor() {
     super();
 
@@ -43,7 +45,6 @@ class TilesBrowser extends Component {
     this.state = {
       ...this.defaultProgress,
       beingDeleted: undefined,
-      selectedTile: undefined,
     };
 
     this.handleChosenTiles = this.handleChosenTiles.bind(this);
@@ -110,10 +111,15 @@ class TilesBrowser extends Component {
   }
 
   handleTileDelete() {
+    const {
+      currentTileName,
+      onTileSelect,
+    } = this.props;
+
     this.setState({
-      beingDeleted: this.state.selectedTile,
-      selectedTile: undefined,
+      beingDeleted: currentTileName,
     }, () => {
+      onTileSelect(undefined);
       deleteTile(this.state.beingDeleted);
     });
   }
@@ -125,27 +131,33 @@ class TilesBrowser extends Component {
   }
 
   handleTileSelect(ev) {
+    const {
+      currentTileName,
+      onTileSelect,
+      project: { uid },
+    } = this.props;
     const el = ev.currentTarget;
     const tileName = el.value;
-    let selectedTile = tileName;
+    let tile = {
+      name: tileName,
+      path: TilesBrowser.tilePath(uid, tileName),
+    };
 
-    // allows for de-selecting a currently select tile
-    if(selectedTile === this.state.selectedTile) selectedTile = undefined;
+    // allows for de-selecting a currently selected tile
+    if(currentTileName === tile.name) tile = undefined;
 
-    this.setState({
-      selectedTile,
-    });
+    onTileSelect(tile);
   }
 
   render() {
     const {
-      project,
+      currentTileName,
+      project: { uid },
       tiles,
     } = this.props;
     const {
       beingDeleted,
       progressMessage,
-      selectedTile,
       showProgress,
       uploadProgress,
     } = this.state;
@@ -182,7 +194,7 @@ class TilesBrowser extends Component {
             <button
               className="nav-item nav-btn"
               title="Delete tile"
-              disabled={ !selectedTile }
+              disabled={ !currentTileName }
               onClick={ this.handleTileDelete }
             >
               <SvgIcon
@@ -207,10 +219,10 @@ class TilesBrowser extends Component {
               onExited={ this.handleTileDeletion }
             >
               <Tile
-                current={ name === selectedTile || name === beingDeleted }
+                current={ name === currentTileName || name === beingDeleted }
                 name={ name }
                 onSelect={ this.handleTileSelect }
-                src={ `/projects/${ project.uid }/tiles/${ name }` }
+                src={ TilesBrowser.tilePath(uid, name) }
               />
             </CSSTransition>
           ))}
@@ -222,6 +234,8 @@ class TilesBrowser extends Component {
 }
 
 TilesBrowser.propTypes = {
+  currentTileName: string,
+  onTileSelect: func,
   project: shape({
     uid: number,
   }),
