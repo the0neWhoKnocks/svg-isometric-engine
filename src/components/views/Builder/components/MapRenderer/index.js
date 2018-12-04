@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { arrayOf, func, number, string } from 'prop-types';
+import { arrayOf, func, number, object } from 'prop-types';
 import {
   LAYER,
 } from 'CONSTANTS/propTypes';
@@ -36,7 +36,6 @@ class MapRenderer extends Component {
     const {
       canvasHeight,
       canvasWidth,
-      currentTilePath,
     } = this.props;
 
     this.tileCanvas = this.els.tileCanvas;
@@ -44,31 +43,18 @@ class MapRenderer extends Component {
     this.tileCanvas.width = canvasWidth;
     this.tileCanvas.height = canvasHeight;
 
-    if(currentTilePath){
-      if(currentTilePath !== this.currentTilePath){
-        this.currentTilePath = currentTilePath;
-
-        const tileImage = new Image();
-        tileImage.addEventListener('load', () => {
-          this.tileBrush = document.createElement('canvas');
-          this.tileBrushCtx = this.tileBrush.getContext('2d');
-          this.tileBrush.width = tileImage.width;
-          this.tileBrush.height = tileImage.height;
-          this.tileBrushCtx.drawImage(tileImage, 0, 0);
-        });
-        tileImage.src = currentTilePath;
-      }
-
-      this.renderTileBrush(ev.nativeEvent.offsetX, ev.nativeEvent.offsetY);
-    }
+    this.renderTileBrush(ev.nativeEvent.offsetX, ev.nativeEvent.offsetY);
   }
 
   renderTileBrush(xPos, yPos) {
-    this.tileCtx.clearRect(0, 0, this.tileCanvas.width, this.tileCanvas.height);
-    if(this.tileBrush) {
-      const centerX = xPos - (this.tileBrush.width / 2);
-      const centerY = yPos - (this.tileBrush.height / 2);
-      this.tileCtx.drawImage(this.tileBrush, centerX, centerY);
+    const tileBrush = this.props.currentTile;
+
+    if(tileBrush){
+      const centerX = xPos - (tileBrush.width / 2);
+      const centerY = yPos - (tileBrush.height / 2);
+
+      this.tileCtx.clearRect(0, 0, this.tileCanvas.width, this.tileCanvas.height);
+      this.tileCtx.drawImage(tileBrush, centerX, centerY);
     }
   }
 
@@ -166,7 +152,7 @@ MapRenderer.defaultProps = {
 MapRenderer.propTypes = {
   canvasHeight: number,
   canvasWidth: number,
-  currentTilePath: string,
+  currentTile: object,
   layers: arrayOf(LAYER),
   mapHeight: number,
   mapWidth: number,

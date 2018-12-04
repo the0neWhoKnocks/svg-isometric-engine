@@ -10,6 +10,7 @@ import {
   SET_PROJECT,
   SET_PROJECTS,
   SET_TILES,
+  SET_TILES_CACHE,
 } from './actionTypes';
 
 export default (state = initialState, action = {}) => {
@@ -17,7 +18,9 @@ export default (state = initialState, action = {}) => {
 
   switch( type ){
     case SET_CURRENT_TILE: {
-      reducerLogger(type, ['current-tile']);
+      reducerLogger(type, [
+        'current tile to:', `${ BLUE } ${ payload }`,
+      ]);
 
       return {
         ...state,
@@ -64,6 +67,7 @@ export default (state = initialState, action = {}) => {
       return {
         ...state,
         project: payload,
+        tilesPath: `/projects/${ payload.uid }/tiles`,
       };
     }
 
@@ -82,6 +86,14 @@ export default (state = initialState, action = {}) => {
       return {
         ...state,
         tiles: [...payload],
+      };
+    }
+
+    case SET_TILES_CACHE: {
+      reducerLogger(type, ['tiles-cache']);
+      return {
+        ...state,
+        tilesCache: payload,
       };
     }
 
