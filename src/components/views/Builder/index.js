@@ -17,14 +17,17 @@ import {
   setCurrentTile,
   saveProject,
   setLayerThumb,
+  setTilesCache,
 } from 'STATE/Builder/actions';
 import {
-  getCurrentTileName,
-  getCurrentTilePath,
+  getCurrentTile,
   getLayerName,
   getLayers,
   getProject,
   getProjects,
+  getTiles,
+  getTilesCache,
+  getTilesPath,
 } from 'STATE/Builder/selectors';
 import { get as getData } from 'UTILS/storage';
 import MapRenderer from './components/MapRenderer';
@@ -33,12 +36,14 @@ import TopNav from './components/TopNav';
 import styles, { globals as globalStyles } from './styles';
 
 const builderProps = (state) => ({
-  currentTileName: getCurrentTileName(state),
-  currentTilePath: getCurrentTilePath(state),
+  currentTile: getCurrentTile(state),
   layerName: getLayerName(state),
   layers: getLayers(state),
   project: getProject(state),
   projects: getProjects(state),
+  tiles: getTiles(state),
+  tilesCache: getTilesCache(state),
+  tilesPath: getTilesPath(state),
 });
 
 const TILE_WIDTH_MIN = 5;
@@ -60,6 +65,32 @@ class Builder extends Component {
     }
 
     return (Object.keys(newState).length) ? newState : null;
+  }
+
+  static prepTiles(tiles, tilesPath) {
+    const _tiles = {};
+
+    return new Promise((resolve, reject) => {
+      const loadTile = (ndx) => {
+        const tile = tiles[ndx];
+        const tileImage = new Image();
+
+        tileImage.addEventListener('load', () => {
+          const tileCanvas = document.createElement('canvas');
+          const tileCtx = tileCanvas.getContext('2d');
+          tileCanvas.width = tileImage.width;
+          tileCanvas.height = tileImage.height;
+          tileCtx.drawImage(tileImage, 0, 0);
+          _tiles[tile] = tileCanvas;
+
+          if((ndx + 1) === tiles.length) resolve(_tiles);
+          else loadTile(ndx+1);
+        });
+        tileImage.src = `${ tilesPath }/${ tile }`;
+      };
+
+      loadTile(0);
+    });
   }
 
   constructor(props) {
@@ -147,6 +178,10 @@ class Builder extends Component {
   }
 
   initBuilder() {
+    const {
+      tiles,
+      tilesPath,
+    } = this.props;
     const { project } = this.state;
     let mapProps = {};
 
@@ -172,6 +207,10 @@ class Builder extends Component {
     window.addEventListener('keydown', this.handleKeyBindings);
     window.addEventListener('beforeunload', this.handleUnload);
     window.addEventListener('resize', this.handleResize);
+
+    Builder.prepTiles(tiles, tilesPath).then((cachedTiles) => {
+      setTilesCache(cachedTiles);
+    });
   }
 
   /**
@@ -349,151 +388,166 @@ class Builder extends Component {
 
   render() {
     const {
-      currentTileName,
-      currentTilePath,
-      layerName,
-      layers,
-      projects,
-    } = this.props;
-    const {
-      builderCanvasWidth,
-      builderCanvasHeight,
-      error,
-      horzPaneSize,
-      mapHeight,
-      mapWidth,
-      saving,
       builderIsVisible,
-      tileWidth,
-      tileWidthVal,
-      vertPaneSize,
     } = this.state;
-    let overlayMsg;
-    let overlayClass = '';
+    const showBuilder = this.mounted && builderIsVisible;
+    const showProjectsList = this.mounted && !builderIsVisible;
+    let builderContent;
 
-    if(saving) overlayMsg = 'Saving';
-    else if(error) {
-      overlayMsg = (
+    if(showBuilder){
+      const {
+        currentTile,
+        layerName,
+        layers,
+        project: { uid },
+        tilesCache,
+      } = this.props;
+      const {
+        builderCanvasWidth,
+        builderCanvasHeight,
+        error,
+        horzPaneSize,
+        mapHeight,
+        mapWidth,
+        saving,
+        tileWidth,
+        tileWidthVal,
+        vertPaneSize,
+      } = this.state;
+      let overlayMsg;
+      let overlayClass = '';
+
+      if(saving) overlayMsg = 'Saving';
+      else if(error) {
+        overlayMsg = (
+          <Fragment>
+            {error.msg}&nbsp;
+            <button onClick={this.handleProjectSave}>Try Again</button>
+          </Fragment>
+        );
+        overlayClass += ' is--error';
+      }
+
+      if(overlayMsg) overlayClass += ' is--visible';
+
+      builderContent = (
         <Fragment>
-          {error.msg}&nbsp;
-          <button onClick={this.handleProjectSave}>Try Again</button>
+          <TopNav
+            onSave={this.handleProjectSave}
+          />
+          <SplitPane
+            split="vertical"
+            onChange={this.handleVerticalResize}
+          >
+            <Pane initialSize={vertPaneSize}>
+              <SplitPane
+                split="horizontal"
+                onChange={this.handleHorizontalResize}
+              >
+                <Pane
+                  ref={(ref) => this.els.builderPane = ref}
+                  initialSize={horzPaneSize}
+                  className="map-pane"
+                >
+                  <div className={`map-pane__label ${ styles.mapPaneLabel }`}>
+                    {`Builder${ (layerName) ? ` | ${ layerName }` : '' }`}
+                  </div>
+                  <MapRenderer
+                    canvasWidth={ builderCanvasWidth }
+                    canvasHeight={ builderCanvasHeight }
+                    currentTile={ tilesCache[currentTile] }
+                    layers={ layers }
+                    mapWidth={ mapWidth }
+                    mapHeight={ mapHeight }
+                    onLayerRender={ this.handleLayerRender }
+                    tileWidth={ tileWidth }
+                  />
+                  <nav className={`builder-nav ${ styles.builderNav }`}>
+                    <label>
+                      Map:&nbsp;
+                      <input
+                        type="number"
+                        value={mapWidth}
+                        name="mapWidth"
+                        onChange={this.handleMapSizeChange}
+                      />
+                      &nbsp;x&nbsp;
+                      <input
+                        type="number"
+                        value={mapHeight}
+                        name="mapHeight"
+                        onChange={this.handleMapSizeChange}
+                      />
+                    </label>
+                    <label>
+                      Tile Width:
+                      <input
+                        type="number"
+                        value={tileWidthVal}
+                        name="tileWidth"
+                        onChange={this.handleTileWidthChange}
+                        min={TILE_WIDTH_MIN}
+                        max={TILE_WIDTH_MAX}
+                      />
+                    </label>
+                  </nav>
+                </Pane>
+                <Pane className="map-pane">
+                  <div className={`map-pane__label ${ styles.mapPaneLabel }`}>
+                    Preview
+                  </div>
+                </Pane>
+              </SplitPane>
+            </Pane>
+            <Pane>
+              <div className={`${ styles.rail }`}>
+                <nav>
+                  <button>Load</button>
+                  <button>Save</button>
+                  <button>Undo</button>
+                  <button>Redo</button>
+                </nav>
+                <Tabs
+                  className={`${ styles.tabs }`}
+                  items={[
+                    {
+                      content: <Layers />,
+                      icon: 'layers',
+                      label: 'Layers',
+                    },
+                    {
+                      content: (
+                        <TilesBrowser
+                          currentTile={ currentTile }
+                          onTileSelect={ this.handleTileSelect }
+                          projectId={ uid }
+                        />
+                      ),
+                      icon: 'photo_library',
+                      label: 'Tiles',
+                    },
+                  ]}
+                />
+              </div>
+            </Pane>
+          </SplitPane>
+          <div className={`overlay ${ styles.overlay }${ overlayClass }`}>
+            <div className="overlay__msg">{overlayMsg}</div>
+          </div>
         </Fragment>
       );
-      overlayClass += ' is--error';
     }
+    else if(showProjectsList){
+      const {
+        projects,
+      } = this.props;
 
-    if(overlayMsg) overlayClass += ' is--visible';
+      builderContent = <ProjectSelector projects={ projects } />;
+    }
 
     return (
       <div className={`${ styles.root }`}>
-        {(this.mounted && !builderIsVisible) && (
-          <ProjectSelector projects={ projects } />
-        )}
-        {(this.mounted && builderIsVisible) && (
-          <Fragment>
-            <TopNav
-              onSave={this.handleProjectSave}
-            />
-            <SplitPane
-              split="vertical"
-              onChange={this.handleVerticalResize}
-            >
-              <Pane initialSize={vertPaneSize}>
-                <SplitPane
-                  split="horizontal"
-                  onChange={this.handleHorizontalResize}
-                >
-                  <Pane
-                    ref={(ref) => this.els.builderPane = ref}
-                    initialSize={horzPaneSize}
-                    className="map-pane"
-                  >
-                    <div className={`map-pane__label ${ styles.mapPaneLabel }`}>
-                      {`Builder${ (layerName) ? ` | ${ layerName }` : '' }`}
-                    </div>
-                    <MapRenderer
-                      canvasWidth={builderCanvasWidth}
-                      canvasHeight={builderCanvasHeight}
-                      currentTilePath={currentTilePath}
-                      layers={layers}
-                      mapWidth={mapWidth}
-                      mapHeight={mapHeight}
-                      onLayerRender={this.handleLayerRender}
-                      tileWidth={tileWidth}
-                    />
-                    <nav className={`builder-nav ${ styles.builderNav }`}>
-                      <label>
-                        Map:&nbsp;
-                        <input
-                          type="number"
-                          value={mapWidth}
-                          name="mapWidth"
-                          onChange={this.handleMapSizeChange}
-                        />
-                        &nbsp;x&nbsp;
-                        <input
-                          type="number"
-                          value={mapHeight}
-                          name="mapHeight"
-                          onChange={this.handleMapSizeChange}
-                        />
-                      </label>
-                      <label>
-                        Tile Width:
-                        <input
-                          type="number"
-                          value={tileWidthVal}
-                          name="tileWidth"
-                          onChange={this.handleTileWidthChange}
-                          min={TILE_WIDTH_MIN}
-                          max={TILE_WIDTH_MAX}
-                        />
-                      </label>
-                    </nav>
-                  </Pane>
-                  <Pane className="map-pane">
-                    <div className={`map-pane__label ${ styles.mapPaneLabel }`}>
-                      Preview
-                    </div>
-                  </Pane>
-                </SplitPane>
-              </Pane>
-              <Pane>
-                <div className={`${ styles.rail }`}>
-                  <nav>
-                    <button>Load</button>
-                    <button>Save</button>
-                    <button>Undo</button>
-                    <button>Redo</button>
-                  </nav>
-                  <Tabs
-                    className={`${ styles.tabs }`}
-                    items={[
-                      {
-                        content: <Layers />,
-                        icon: 'layers',
-                        label: 'Layers',
-                      },
-                      {
-                        content: (
-                          <TilesBrowser
-                            currentTileName={ currentTileName }
-                            onTileSelect={ this.handleTileSelect }
-                          />
-                        ),
-                        icon: 'photo_library',
-                        label: 'Tiles',
-                      },
-                    ]}
-                  />
-                </div>
-              </Pane>
-            </SplitPane>
-            <div className={`overlay ${ styles.overlay }${ overlayClass }`}>
-              <div className="overlay__msg">{overlayMsg}</div>
-            </div>
-          </Fragment>
-        )}
+        { builderContent }
       </div>
     );
   }
@@ -506,8 +560,7 @@ Builder.defaultProps = {
 };
 
 Builder.propTypes = {
-  currentTileName: string,
-  currentTilePath: string,
+  currentTile: string,
   dialogError: shape({
     data: string,
     status: number,
@@ -520,6 +573,9 @@ Builder.propTypes = {
   project: PROJECT,
   projects: PROJECTS,
   tileWidth: number,
+  tiles: arrayOf(string),
+  tilesCache: shape({}),
+  tilesPath: string,
 };
 
 export default connect(builderProps)(Builder);

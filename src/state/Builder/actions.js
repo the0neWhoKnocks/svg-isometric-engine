@@ -21,6 +21,7 @@ import {
   SET_PROJECT,
   SET_PROJECTS,
   SET_TILES,
+  SET_TILES_CACHE,
 } from './actionTypes';
 
 const createProject = opts => {
@@ -170,6 +171,15 @@ const setTiles = (tiles) => {
   });
 };
 
+const setTilesCache = (tiles) => {
+  const { dispatch } = store.app;
+
+  dispatch({
+    type: SET_TILES_CACHE,
+    payload: tiles,
+  });
+};
+
 const updateProjectTiles = (tiles) => {
   const axios = require('axios');
   const { getState } = store.app;
@@ -197,5 +207,6 @@ export {
   setProject,
   setProjects,
   setTiles,
+  setTilesCache,
   updateProjectTiles,
 };

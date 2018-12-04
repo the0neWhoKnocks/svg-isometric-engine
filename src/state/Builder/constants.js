@@ -1,12 +1,14 @@
 const NAME = 'Builder';
 const initialState = {
   currentLayer: {},
-  currentTile: {},
+  currentTile: undefined,
   layers: [],
   layerThumbs: [],
   project: undefined,
   projects: [],
   tiles: [],
+  tilesCache: {},
+  tilesPath: undefined,
 };
 
 export {
