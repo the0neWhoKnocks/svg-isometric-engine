@@ -93,7 +93,10 @@ export default (state = initialState, action = {}) => {
       reducerLogger(type, ['tiles-cache']);
       return {
         ...state,
-        tilesCache: payload,
+        tilesCache: {
+          ...state.tilesCache,
+          ...payload,
+        },
       };
     }
 

@@ -8,6 +8,7 @@ import {
 } from 'CONSTANTS/propTypes';
 import {
   setLayers,
+  setTilesCache,
 } from 'STATE/Builder/actions';
 import {
   getLayers,
@@ -29,6 +30,7 @@ const gridLayer = {
   tiles: [],
   visible: true,
 };
+const GRID_TILE_NAME = '__grid';
 
 class Layers extends Component {
   static createLayer(layers) {
@@ -104,12 +106,15 @@ class Layers extends Component {
     for(let row=0; row<mapRows; row++) {
       const rowArr = [];
       for(let col=0; col<mapColumns; col++) {
-        rowArr.push(gridTile);
+        rowArr.push(GRID_TILE_NAME);
       }
       tiles.push(rowArr);
     }
 
-    return tiles;
+    return {
+      gridSprite: gridTile,
+      gridTiles: tiles,
+    };
   }
 
   constructor(props) {
@@ -128,12 +133,17 @@ class Layers extends Component {
         width: mapColumns,
       } = project.map;
       const tileHeight = tileWidth / 2;
-      gridLayer.tiles = Layers.populateGridTiles({
+      const {
+        gridSprite,
+        gridTiles,
+      } = Layers.populateGridTiles({
         mapColumns,
         mapRows,
         tileHeight,
         tileWidth,
       });
+      gridLayer.tiles = gridTiles;
+      setTilesCache({ [GRID_TILE_NAME]: gridSprite });
 
       layers = [gridLayer, ...layers];
       layers.forEach((layer, ndx) => layer.ndx = ndx);

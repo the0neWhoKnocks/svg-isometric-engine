@@ -455,12 +455,13 @@ class Builder extends Component {
                   <MapRenderer
                     canvasWidth={ builderCanvasWidth }
                     canvasHeight={ builderCanvasHeight }
-                    currentTile={ tilesCache[currentTile] }
+                    currentTile={ currentTile }
                     layers={ layers }
                     mapWidth={ mapWidth }
                     mapHeight={ mapHeight }
                     onLayerRender={ this.handleLayerRender }
                     tileWidth={ tileWidth }
+                    tilesCache={ tilesCache }
                   />
                   <nav className={`builder-nav ${ styles.builderNav }`}>
                     <label>

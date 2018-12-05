@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { arrayOf, func, number, object } from 'prop-types';
+import { arrayOf, func, number, shape, string } from 'prop-types';
 import {
   LAYER,
 } from 'CONSTANTS/propTypes';
@@ -47,7 +47,7 @@ class MapRenderer extends Component {
   }
 
   renderTileBrush(xPos, yPos) {
-    const tileBrush = this.props.currentTile;
+    const tileBrush = this.props.tilesCache[this.props.currentTile];
 
     if(tileBrush){
       const centerX = xPos - (tileBrush.width / 2);
@@ -67,6 +67,7 @@ class MapRenderer extends Component {
       mapWidth,
       onLayerRender,
       tileWidth,
+      tilesCache,
     } = this.props;
     const canvas = this.els.canvas;
     const ctx = canvas.getContext('2d');
@@ -99,7 +100,7 @@ class MapRenderer extends Component {
         for(let x=0; x<mapWidth; x++) {
           for(let y=0; y<mapHeight; y++) {
             if(tiles[y] && tiles[y][x]){
-              const tile = tiles[y][x];
+              const tile = tilesCache[ tiles[y][x] ];
               // sprite could be taller
               const spriteWidth = tileWidth;
               const spriteHeight = (tile.height/tile.width) * tileWidth;
@@ -152,12 +153,13 @@ MapRenderer.defaultProps = {
 MapRenderer.propTypes = {
   canvasHeight: number,
   canvasWidth: number,
-  currentTile: object,
+  currentTile: string,
   layers: arrayOf(LAYER),
   mapHeight: number,
   mapWidth: number,
   onLayerRender: func,
   tileWidth: number,
+  tilesCache: shape({}),
 };
 
 export default MapRenderer;
