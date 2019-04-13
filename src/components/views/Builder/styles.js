@@ -123,7 +123,7 @@ const styles = {
       margin: '0 0.25em',
     },
 
-    ' input': {
+    ' input[type="number"]': {
       width: '4em',
       textAlign: 'center',
     },

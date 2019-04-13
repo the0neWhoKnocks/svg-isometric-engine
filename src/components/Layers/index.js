@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { arrayOf, string } from 'prop-types';
+import { arrayOf, bool, string } from 'prop-types';
 import SvgIcon from 'COMPONENTS/SvgIcon';
 import {
   LAYER,
@@ -61,7 +61,7 @@ class Layers extends Component {
 
   static getDerivedStateFromProps(props, state) {
     const newState = {};
-    const current = Layers.getSelectedLayer(props.layers);
+    const current = Layers.getSelectedLayer(props.layers).index;
 
     if(current !== state.selectedLayer) newState.selectedLayer = current;
 
@@ -69,19 +69,21 @@ class Layers extends Component {
   }
 
   static getSelectedLayer(layers) {
-    let selectedLayer;
+    let layer = {};
 
     for(let i=0; i<layers.length; i++){
       if(layers[i].current){
-        selectedLayer = i;
+        layer.index = i;
+        layer.layer = layers[i];
         break;
       }
     }
 
-    return selectedLayer;
+    return layer;
   }
 
   static populateGridTiles({
+    debug,
     mapColumns,
     mapRows,
     tileHeight,
@@ -102,6 +104,12 @@ class Layers extends Component {
     tileCtx.lineTo(0, tileHeight/2); // left point
     tileCtx.closePath();
     tileCtx.stroke();
+    
+    if(debug){
+      // tile bounding box
+      tileCtx.fillStyle = '#ff000025';
+      tileCtx.fillRect(0, 0, tileWidth, tileHeight);
+    }
 
     for(let row=0; row<mapRows; row++) {
       const rowArr = [];
@@ -116,42 +124,60 @@ class Layers extends Component {
       gridTiles: tiles,
     };
   }
-
-  constructor(props) {
-    super();
-
-    let layers = (props.layers.length)
-      ? props.layers
-      : Layers.createLayer([...props.layers]);
+  
+  static buildLayers({
+    debug,
+    layers,
+    project,
+  }) {
+    let _layers = (layers.length)
+      ? layers
+      : Layers.createLayer([...layers]);
 
     // the grid will always be inserted as the first non-editable layer.
-    if(layers[0].name !== gridLayer.name){
-      const { project } = props;
-      const {
-        height: mapRows,
-        tileWidth,
-        width: mapColumns,
-      } = project.map;
-      const tileHeight = tileWidth / 2;
-      const {
-        gridSprite,
-        gridTiles,
-      } = Layers.populateGridTiles({
-        mapColumns,
-        mapRows,
-        tileHeight,
-        tileWidth,
-      });
-      gridLayer.tiles = gridTiles;
-      setTilesCache({ [GRID_TILE_NAME]: gridSprite });
-
-      layers = [gridLayer, ...layers];
-      layers.forEach((layer, ndx) => layer.ndx = ndx);
+    const {
+      height: mapRows,
+      tileWidth,
+      width: mapColumns,
+    } = project.map;
+    const tileHeight = tileWidth / 2;
+    const {
+      gridSprite,
+      gridTiles,
+    } = Layers.populateGridTiles({
+      debug,
+      mapColumns,
+      mapRows,
+      tileHeight,
+      tileWidth,
+    });
+    gridLayer.tiles = gridTiles;
+    setTilesCache({ [GRID_TILE_NAME]: gridSprite });
+    
+    if(_layers[0].name !== gridLayer.name){
+      _layers = [gridLayer, ..._layers];
     }
+    else{
+      _layers[0] = gridLayer;
+    }
+    
+    _layers.forEach((layer, ndx) => layer.ndx = ndx);
+    
+    return _layers;
+  }
+
+  constructor({
+    debug,
+    layers,
+    project,
+  }) {
+    super();
+
+    const _layers = Layers.buildLayers({ debug, layers, project });
 
     this.state = {
-      layers,
-      selectedLayer: Layers.getSelectedLayer(layers),
+      layers: _layers,
+      selectedLayer: Layers.getSelectedLayer(_layers).index,
     };
 
     this.handleLayerDelete = this.handleLayerDelete.bind(this);
@@ -165,6 +191,17 @@ class Layers extends Component {
   componentDidMount() {
     // only set layers if this is a fresh/empty project
     if(!this.props.layers.length) this.updateLayers();
+  }
+  
+  componentDidUpdate(prevProps) {
+    const { debug, layers, project } = this.props;
+    
+    if(this.props.debug !== prevProps.debug){
+      // have to rebuild grid layer when debug is toggled
+      this.setState({
+        layers: Layers.buildLayers({ debug, layers, project }),
+      });
+    }
   }
 
   handleNewLayer() {
@@ -300,6 +337,7 @@ class Layers extends Component {
 }
 
 Layers.propTypes = {
+  debug: bool,
   layers: arrayOf(LAYER),
   layerThumbs: arrayOf(string),
   project: PROJECT,

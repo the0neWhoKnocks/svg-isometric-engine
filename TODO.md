@@ -123,6 +123,7 @@
 **File Loading**
 - https://www.html5rocks.com/en/tutorials/file/dndfiles/
 - https://codepen.io/monjer/pen/JKRLzM
+- https://codepen.io/zerratar/pen/aLKqBV
 
 **Material Icons**
 - https://material.io/tools/icons/?style=baseline
