@@ -10,14 +10,14 @@
     "build:bundle": "yarn build:babelrc && cross-env PUBLIC_URL=\"/\" BABEL_ENV=\"production\" NODE_ENV=\"production\" node .bin/build",
     "build:bundle:dev": "yarn build:babelrc && cross-env PUBLIC_URL=\"/\" BABEL_ENV=\"development\" NODE_ENV=\"development\" node .bin/build",
     "build:private": "yarn build:babelrc && echo 'Compiling to CommonJS' && cross-env NODE_ENV=\"server\" babel ./src -d ./dist/private",
-    "build:private:watch": "yarn build:private --watch --skip-initial-build",
     "lint": "eslint ./**/*.js",
-    "start:server": "node .bin/prepDist && yarn build:bundle && yarn build:private && node ./dist/private/server init",
-    "start:server:dev": "node .bin/prepDist && yarn build:private && concurrently --kill-others -p {name} -n WEBPACK,BABEL,SERVER -c black.bgCyan,black.bgGreen,black.bgMagenta \"yarn build:bundle:dev\" \"yarn build:private:watch\" \"yarn start:server:watch\"",
-    "start:server:watch": "node ./conf.nodemon.js && cross-env NODE_ENV=\"development\" nodemon --config ./nodemon.json --inspect ./dist/private/server init",
+    "start": "node .bin/prepDist && yarn build:bundle && yarn build:private && node ./dist/private/server init",
+    "start:dev": "node .bin/prepDist && yarn build:private && concurrently --kill-others -p {name} -n WEBPACK,BABEL,SERVER -c black.bgCyan,black.bgGreen,black.bgMagenta \"yarn build:bundle:dev\" \"yarn watch:private\" \"yarn watch:server\"",
     "test": "yarn lint && yarn unit",
     "unit": "yarn build:babelrc && cross-env BABEL_ENV=\"test\" NODE_ENV=\"test\" jest --env=jsdom --config ./.jest/conf.jest.js",
-    "unit:watch": "yarn unit --watchAll"
+    "watch:private": "yarn build:private --watch --skip-initial-build",
+    "watch:server": "node ./conf.nodemon.js && cross-env NODE_ENV=\"development\" nodemon --config ./nodemon.json --inspect ./dist/private/server init",
+    "watch:unit": "yarn unit --watchAll"
   },
   "repository": {
     "type": "git",

@@ -101,6 +101,7 @@ class Builder extends Component {
       builderCanvasHeight: 0,
       builderCanvasWidth: 0,
       builderIsVisible: false,
+      debug: false,
       error: undefined,
       horzPaneSize: '50%',
       mapHeight: props.mapHeight,
@@ -113,6 +114,7 @@ class Builder extends Component {
     };
 
     globalStyles();
+    this.handleDebugToggle = this.handleDebugToggle.bind(this);
     this.handleHorizontalResize = this.handleHorizontalResize.bind(this);
     this.handleKeyBindings = this.handleKeyBindings.bind(this);
     this.handleLayerRender = this.handleLayerRender.bind(this);
@@ -222,6 +224,11 @@ class Builder extends Component {
       builderCanvasHeight: pane.clientHeight,
       builderCanvasWidth: pane.clientWidth,
     };
+  }
+  
+  handleDebugToggle(ev) {
+    const { debug } = this.state;
+    this.setState({ debug: !debug });
   }
 
   handleLayerRender(ndx, layer) {
@@ -405,6 +412,7 @@ class Builder extends Component {
       const {
         builderCanvasWidth,
         builderCanvasHeight,
+        debug,
         error,
         horzPaneSize,
         mapHeight,
@@ -456,6 +464,7 @@ class Builder extends Component {
                     canvasWidth={ builderCanvasWidth }
                     canvasHeight={ builderCanvasHeight }
                     currentTile={ currentTile }
+                    debug={ debug }
                     layers={ layers }
                     mapWidth={ mapWidth }
                     mapHeight={ mapHeight }
@@ -464,6 +473,15 @@ class Builder extends Component {
                     tilesCache={ tilesCache }
                   />
                   <nav className={`builder-nav ${ styles.builderNav }`}>
+                    <label>
+                      Debug:&nbsp;
+                      <input
+                        type="checkbox"
+                        value={debug}
+                        name="debug"
+                        onChange={this.handleDebugToggle}
+                      />
+                    </label>
                     <label>
                       Map:&nbsp;
                       <input
@@ -512,7 +530,7 @@ class Builder extends Component {
                   className={`${ styles.tabs }`}
                   items={[
                     {
-                      content: <Layers />,
+                      content: <Layers debug={ debug } />,
                       icon: 'layers',
                       label: 'Layers',
                     },

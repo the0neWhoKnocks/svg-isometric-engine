@@ -7,5 +7,6 @@ module.exports = {
   parser: 'babel-eslint', // needed to get dynamic imports linting correctly
   rules: {
     'require-jsdoc': 0,
+    'object-property-newline': 0,
   }
 };
